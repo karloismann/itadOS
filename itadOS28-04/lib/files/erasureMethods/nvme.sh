@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # 
 # finds support for specific nvme erasure commands
 # format -s 1: $1 = $disk $2 = Format NVM, $3 = 6
@@ -40,15 +41,16 @@ nvmeSupportsCommand() {
 #
 nvmeCryptoSanitize() {
     disk="$1"
+    TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
 	nvme sanitize /dev/"$disk" -a 4
 	while true;
         do
         	sanitizeStatus=$(nvme sanitize-log /dev/"$disk" | awk 'NR==2 {print $5}')
-            echo "Erasing $disk, please wait.."
-            sleep 0.1
+            echo "Erasing, please wait.. "$sanitizeStatus"" > "$TMP_PROGRESS"
+            sleep 1
             if [[ "$sanitizeStatus" == "0x1" ]];then
-				echo "Erasure completed. (NVMECryptoSanitize)"
+				echo "Erasure completed. (NVMECryptoSanitize)" > "$TMP_PROGRESS"
                 break;
             fi
     done       
@@ -60,14 +62,15 @@ nvmeCryptoSanitize() {
 #
 nvmeSanitize() {
     disk="$1"
+    TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
 	nvme sanitize /dev/"$disk" -a 2
 	while true; do
         sanitizeStatus=$(nvme sanitize-log /dev/"$disk" | awk 'NR==2 {print $5}')
-        echo "Erasing $disk, please wait.."
+        echo "Erasing, please wait.. "$sanitizeStatus"" > "$TMP_PROGRESS"
         sleep 1
         if [[ "$sanitizeStatus" == "0x1" ]]; then
-            echo "Erasure completed. (NVMESanitize)"
+            echo "Erasure completed. (NVMESanitize)" > "$TMP_PROGRESS"
             break;
         fi
     done
@@ -79,8 +82,11 @@ nvmeSanitize() {
 #
 nvmeFormatSecure() {
     disk="$1"
+    TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
+    echo "Erasing, please wait..." > "$TMP_PROGRESS"
 	nvme format /dev/"$disk" -s 1 --force
+    echo "Erasure completed. (NVMEFormatSecure)" > "$TMP_PROGRESS"
 }
 
 #
@@ -89,6 +95,9 @@ nvmeFormatSecure() {
 #
 nvmeFormatCrypto() {
     disk="$1"
+    TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
+    echo "Erasing, please wait..." > "$TMP_PROGRESS"
 	nvme format /dev/"$disk" -s 2 --force
+    echo "Erasure completed. (NVMEFormatCrypto)" > "$TMP_PROGRESS"
 }

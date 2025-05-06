@@ -50,12 +50,7 @@ wakeFromFrozen() {
 
     if [[ "$FROZEN" != "no" ]]; then
         for (( i=0; i<=2; i++ )); do
-            #suspend 10
-
-            #this is for testing REMOVE. uncomment SUSPEND
-            echo "is $disk  frozen? : $FROZEN"
-            echo "attempting to unfreeze $i"
-            #REMOVE THE ABOVE
+            suspend 10
 
             isDiskFrozen "$disk"
             if [[ "$FROZEN" == "no" ]]; then
@@ -117,8 +112,10 @@ secureErase() {
 	disk="$1"
 
 	pass="erasure"
+	echo "Secure Erase in progress... this may take a few hours." > "$TMP_PROGRESS"
 	hdparm --user-master u --security-set-pass "$pass" /dev/"$disk"
 	hdparm --user-master u --security-erase "$pass" /dev/"$disk"
+	echo "Secure Erase completed." > "$TMP_PROGRESS"
 }
 
 #
@@ -127,6 +124,7 @@ secureErase() {
 #
 blockErase() {
 	disk="$1"
+	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
 	hdparm --yes-i-know-what-i-am-doing --sanitize-block-erase /dev/"$disk"
 	status=""
@@ -136,11 +134,11 @@ blockErase() {
 	do
 		percentage=$(hdparm --sanitize-status /dev/"$disk" | awk 'NR==6 {gsub(/[\(\)%]/, ""); print $3}')
 		status=$(hdparm --sanitize-status /dev/"$disk" | awk 'NR==6 {print $1}')
-		echo "$percentage"
+		echo "Erasure in progress.. $percentage" > "$TMP_PROGRESS"
 		if [[ "$percentage" == "Operation" ]]
 		then
-			echo "$disk has been WIPED Block Erase"
-			echo "$(hdparm --sanitize-status /dev/"$disk")"
+			echo "Disk erased using Block Erase" > "$TMP_PROGRESS"
+			echo "$(hdparm --sanitize-status /dev/"$disk")" > "$TMP_PROGRESS"
 			break;
 		fi
 		sleep 0.5
@@ -153,10 +151,14 @@ blockErase() {
 #
 overwrite() {
 	disk="$1"
-
-	shred -n 1 -z -v /dev/"$disk"
+	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 	method="Overwrite"
 
+	shred -n 1 -z -v /dev/"$disk" 2>&1 | while read -r line; do
+        echo "$line" > "$TMP_PROGRESS"
+    done
+
+	echo "Erasure completed. (Overwrite)" > "$TMP_PROGRESS"
 }
 
             

@@ -43,7 +43,9 @@ erasure() {
                 echo "Tool:, $(hdparm -V)" >> "$TMP_REPORT"
             else
                 # Erasure commands
-                overwrite "$disk"
+                #overwrite "$disk"
+                #REMOVE THIS
+                echo "overwriting $disk which is $DISK_TYPE"
                 # Information for report
                 echo "Method: Overwrite" >> "$TMP_REPORT"
                 echo "Tool:" "$(shred --version | awk 'NR==1{print}')" >> "$TMP_REPORT"
@@ -67,10 +69,19 @@ erasure() {
                 echo "Tool:, $(hdparm -V)" >> "$TMP_REPORT"
             else
                 # Erasure commands
-                overwrite "$disk"
+                #overwrite "$disk"
+                #REMOVE THIS
+                echo "overwriting $disk which is $DISK_TYPE"
                 # Information for report
                 echo "Method:, Overwrite" >> "$TMP_REPORT"
                 echo "Tool:," "$(shred --version | awk 'NR==1{print}')" >> "$TMP_REPORT"
+
+                # Progress for tailwind GUI
+                # REPLACE WITH ACTUAL DATA
+                for (( i=0; i<=30; i++ )); do
+                    echo "$i erasure in progress" > "$TMP_PROGRESS"
+                    sleep 0.3
+                done
             fi
             return 0
             ;;
@@ -130,10 +141,16 @@ erasure() {
             ;;
         *)  
             # Erasure commands
-            overwrite "$disk"
+            #overwrite "$disk"
             # Information for report
             echo "Method:, Overwrite" >> "$TMP_REPORT"
             echo "Tool:," "$(shred --version | awk 'NR==1{print}')" >> "$TMP_REPORT"
+            # Progress for tailwind GUI
+            # REPLACE WITH ACTUAL DATA
+                for (( i=0; i<=10; i++ )); do
+                    echo "$i erasure in progress" > "$TMP_PROGRESS"
+                    sleep 0.3
+                done
             return 0
             ;;
     esac

@@ -18,7 +18,7 @@ processWithVerification() {
         serial="$(awk -v disk="$i"  'NR==disk {print $3}' "$CHOSEN_DISKS_DESC")"
         model="$(awk -v disk="$i"  'NR==disk {for(i=7; i<=NF; i++) printf $i " "; print ""}' "$CHOSEN_DISKS_DESC")"
         # Informaiton for report
-        echo "Disk (location, Serial Number, Model):" "$disk" "$serial" "$model" > "$TMP_REPORT"
+        echo "Disk (location, Serial Number, Model):" "," "$disk" "," "$serial" "," "$model" > "$TMP_REPORT"
 
         # Look at chosen disks and get their type (nvme, sata ssd, sata hdd etc.)
         getDiskType "$disk"

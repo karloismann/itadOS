@@ -2,6 +2,7 @@
 
 # Initialize variables
 TMP_PROGRESS="lib/files/tmp/progress"
+CHOSEN_DISKS_DESC="lib/files/tmp/chosenDisksDesc.txt"
 #verifyProgressFiles="lib/files/tmp/progress/verify"
 message=""
 
@@ -43,18 +44,24 @@ erasureProgress() {
 
         # Get disk name from file name removing '_progress.txt'
         disk=$(basename "$file" | sed 's/_progress\.txt//')
+
+        # Get disk size
+        size=$(awk -v d="$disk" '$1 == d {print $2}' "$CHOSEN_DISKS_DESC")
+
         # Progress is received from the file
-        progress=$(cat "$file")
+        progress=$(sed 's/^/    /' "$file")
         # Append progress message to variable
-        PROGRESS_MSG+="Status: $progress\n"
+        PROGRESS_MSG+="$disk ($size):\n$progress\n\n"
     done
 
     # Display progress
-    echo "Erasure progress:"
+    echo "Erasure progress of $ASSET_TAG:"
+    echo "=========================="
+    echo ""
+    echo ""
     echo -e "$PROGRESS_MSG"
 
     # Initialize message variable
     PROGRESS_MSG=""
 
-    sleep 0.4
 }

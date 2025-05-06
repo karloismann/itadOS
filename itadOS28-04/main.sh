@@ -31,8 +31,9 @@ source lib/erasure.sh
 #erasureProgress - erasure progress indicators in terminal
 source lib/erasureProgress.sh
 source lib/verifyErasure2.sh
-source lib/reportGenerator.sh
+source lib/reportGenerator2.sh
 source lib/process.sh
+source lib/reportToUSB2.sh
 
 initialize
 getAssetTagRQ
@@ -64,6 +65,7 @@ esac
 
 
 reportGenerator
+reportToUSB
 
 
 #echo "$ASSET_TAG"
