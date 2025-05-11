@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+  <assetTag>dsafadsfasdfadsfsdf</assetTag>
+  <serialNumber>VirtualBox-174bb59a-0983-40b4-ab63-c016ba1bdbb0</serialNumber>
+  <biosTime>10-05-2025 20:17</biosTime>
+  <status>Erasure cancelled.</status>
+  <specifications>
+    <entry>
+      <hwPath>/0</hwPath>
+      <device>bus</device>
+      <class>VirtualBox</class>
+      <description>  </description>
+    </entry>
+    <entry>
+      <hwPath>/0/0</hwPath>
+      <device>memory</device>
+      <class>128KiB</class>
+      <description>BIOS</description>
+    </entry>
+    <entry>
+      <hwPath>/0/1</hwPath>
+      <device>memory</device>
+      <class>8GiB</class>
+      <description>System memory</description>
+    </entry>
+    <entry>
+      <hwPath>/0/2</hwPath>
+      <device>processor</device>
+      <class>AMD</class>
+      <description>Ryzen 9 5950X 16-Core Processor</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100</hwPath>
+      <device>bridge</device>
+      <class>440FX</class>
+      <description>- 82441FX PMC [Natoma]</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/1</hwPath>
+      <device>bridge</device>
+      <class>82371SB</class>
+      <description>PIIX3 ISA [Natoma/Triton II]</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/1/0</hwPath>
+      <device>input</device>
+      <class>PnP</class>
+      <description>device PNP0303</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/1/1</hwPath>
+      <device>input</device>
+      <class>PnP</class>
+      <description>device PNP0f03</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/1.1</hwPath>
+      <device>scsi1</device>
+      <class>storage</class>
+      <description>82371AB/EB/MB PIIX4 IDE</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/1.1/0.0.0</hwPath>
+      <device>/dev/cdrom</device>
+      <class>disk</class>
+      <description>CD-ROM</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/1.1/0.0.0/0</hwPath>
+      <device>/dev/cdrom</device>
+      <class>disk</class>
+      <description>  </description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/2</hwPath>
+      <device>/dev/fb0</device>
+      <class>display</class>
+      <description>SVGA II Adapter</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/3</hwPath>
+      <device>enp0s3</device>
+      <class>network</class>
+      <description>82540EM Gigabit Ethernet Controller</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/4</hwPath>
+      <device>input9</device>
+      <class>input</class>
+      <description>VirtualBox mouse integration</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/5</hwPath>
+      <device>card0</device>
+      <class>multimedia</class>
+      <description>82801AA AC'97 Audio Controller</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/6</hwPath>
+      <device>bus</device>
+      <class>KeyLargo/Intrepid</class>
+      <description>USB</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/6/1</hwPath>
+      <device>usb2</device>
+      <class>bus</class>
+      <description>OHCI PCI host controller</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/6/1/1</hwPath>
+      <device>input6</device>
+      <class>input</class>
+      <description>VirtualBox USB Tablet</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/7</hwPath>
+      <device>bridge</device>
+      <class>82371AB/EB/MB</class>
+      <description>PIIX4 ACPI</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/b</hwPath>
+      <device>bus</device>
+      <class>82801FB/FBM/FR/FW/FRW</class>
+      <description>(ICH6 Family) USB2 EHCI Controller</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/b/1</hwPath>
+      <device>usb1</device>
+      <class>bus</class>
+      <description>EHCI Host Controller</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/d</hwPath>
+      <device>scsi2</device>
+      <class>storage</class>
+      <description>82801HM/HEM (ICH8M/ICH8M-E) SATA Controller [AHCI mode]</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/d/0.0.0</hwPath>
+      <device>/dev/sda</device>
+      <class>disk</class>
+      <description>22GB VBOX HARDDISK</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/d/0.0.0/1</hwPath>
+      <device>/dev/sda1</device>
+      <class>volume</class>
+      <description>19GiB EXT4 volume</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/d/0.0.0/2</hwPath>
+      <device>/dev/sda2</device>
+      <class>volume</class>
+      <description>975MiB Extended partition</description>
+    </entry>
+    <entry>
+      <hwPath>/0/100/d/0.0.0/2/5</hwPath>
+      <device>/dev/sda5</device>
+      <class>volume</class>
+      <description>975MiB Linux swap volume</description>
+    </entry>
+    <entry>
+      <hwPath>/1</hwPath>
+      <device>input0</device>
+      <class>input</class>
+      <description>AT Translated Set 2 keyboard</description>
+    </entry>
+    <entry>
+      <hwPath>/2</hwPath>
+      <device>input2</device>
+      <class>input</class>
+      <description>Power Button</description>
+    </entry>
+    <entry>
+      <hwPath>/3</hwPath>
+      <device>input3</device>
+      <class>input</class>
+      <description>Video Bus</description>
+    </entry>
+    <entry>
+      <hwPath>/4</hwPath>
+      <device>input4</device>
+      <class>input</class>
+      <description>Sleep Button</description>
+    </entry>
+    <entry>
+      <hwPath>/5</hwPath>
+      <device>input5</device>
+      <class>input</class>
+      <description>ImExPS/2 Generic Explorer Mouse</description>
+    </entry>
+    <entry>
+      <hwPath>/6</hwPath>
+      <device>input7</device>
+      <class>input</class>
+      <description>PC Speaker</description>
+    </entry>
+  </specifications>
+</report>

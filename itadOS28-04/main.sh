@@ -1,8 +1,9 @@
 #!/bin/bash
 
-declare -A disk_erasure_pids
-declare -A disk_verify_pids
+# Start script from own path
+cd "$(dirname "$0")"
 
+# Used in process.sh
 erasureVerificatioDone=""
 
 source lib/initialize.sh
@@ -25,6 +26,7 @@ source lib/getDiskType.sh
 #overwrite - starts overwrite erasure (THIS IS FOR ALL TYPES)
 source lib/files/erasureMethods/sata.sh
 source lib/files/erasureMethods/nvme.sh
+source lib/files/erasureMethods/emmc.sh
 #erasure - erasure logic
 source lib/erasure.sh
 #erasureProgressTUI - erasure progress indicators with whiptail --msgbox
@@ -42,6 +44,7 @@ getChosenDisks
 
 # Assign a condition to this
 #suspend "4"
+
 case $CHOSEN_DISK_STATUS in
     # If 'OK' is pressed and no disks are selected then only getting specifications.
     # If disks are selected then the erasure will start

@@ -1,6 +1,9 @@
 #!/bin/bash
 
 processWithVerification() {
+    
+    declare -A disk_erasure_pids
+    declare -A disk_verify_pids
 
     # Initialize progress files
     rm lib/files/tmp/progress/erasure/*
@@ -10,15 +13,27 @@ processWithVerification() {
     # Collect PIDs of erasures
     #
     for (( i=1; i<="$CHOSEN_DISKS_COUNT"; i++ )); do
-        # Create a temporary file to keep details for reporting
-        TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
 
         # Gather disk information ($disk will be used throughout the program for erasure etc.)
         disk="$(awk -v disk="$i"  'NR==disk {print $1}' "$CHOSEN_DISKS_DESC")"
+        size="$(awk -v disk="$i"  'NR==disk {print $2}' "$CHOSEN_DISKS_DESC")"
+        rota="$(awk -v disk="$i"  'NR==disk {print $5}' "$CHOSEN_DISKS_DESC")"
+        type="$(awk -v disk="$i"  'NR==disk {print $6}' "$CHOSEN_DISKS_DESC")"
         serial="$(awk -v disk="$i"  'NR==disk {print $3}' "$CHOSEN_DISKS_DESC")"
         model="$(awk -v disk="$i"  'NR==disk {for(i=7; i<=NF; i++) printf $i " "; print ""}' "$CHOSEN_DISKS_DESC")"
-        # Informaiton for report
-        echo "Disk (location, Serial Number, Model):" "," "$disk" "," "$serial" "," "$model" > "$TMP_REPORT"
+        
+        # Check if type is SATA SSD or SATA HDD
+        if [[ "${type}" == "sata" && "${rota}" == "1" ]]; then
+            type="sata HDD"
+        elif [[ "${type}" == "sata" && "${rota}" == "0" ]]; then
+            type="sata SSD"
+        fi
+
+         # Create a temporary file to keep details for reporting
+        TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
+
+        # Information for report
+        echo "Disk (location, Serial Number, Model, Type, Size):" "," "$disk" "," "$serial" "," "$model" "," "$type" "," "$size" > "$TMP_REPORT"
 
         # Look at chosen disks and get their type (nvme, sata ssd, sata hdd etc.)
         getDiskType "$disk"
@@ -56,11 +71,12 @@ processWithVerification() {
                 continue
             fi
 
-            # If disk's pid is active then..
+            # If disk's pid is active then erasure ongoing
             if kill -0 "$pid" 2>/dev/null; then
                 continue
 
-            # If disk's pid is not active then..
+            # If disk's pid is not active then disk has been erased
+            # and start erasure verification.
             else
                 wait "$pid"
                 if [[ $? == 0 ]]; then
@@ -81,14 +97,16 @@ processWithVerification() {
             # Current Disk erasure pid
             verifypid="${disk_verify_pids[$disk]}"
 
-            # If disk has been erased then continue
+            # If disk has been verified then continue
             if [[ "${verifyCompleted[@]}"  =~ "$disk" ]]; then
                 continue
             fi
 
-            # If disk's pid is active then..
+            # If disk's pid is active then still verifying
             if kill -0 "$verifypid" 2>/dev/null; then
                 continue
+
+            # disk verification completed
             else
                 wait "$verifypid"
                 if [[ $? == 0 ]]; then

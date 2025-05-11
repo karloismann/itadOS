@@ -16,46 +16,181 @@ getSectors() {
 mmcSanitize() {
     disk="$1"
 
-	mmc sanitize /dev/"$disk"
+	mmc sanitize /dev/"$disk" &
+	mmc_pid=$!
+	wait "$mmc_pid"
+
+	exit_code=$?
+
+	case "$exit_code" in
+		0)
+			echo "MMC Sanitize completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Sanitize FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Sanitize FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 
 }
 
 mmcSecureErase() {
 
 	disk="$1"
-	mmc erase secure-erase 0 $(getSectors "$disk") /dev/"$disk"
+	mmc erase secure-erase 0 $(getSectors "$disk") /dev/"$disk" &
+	mmc_pid=$!
+	wait "$mmc_pid"
+	
+	exit_code=$?
+
+	case "$exit_code" in
+		0)
+			echo "MMC Secure Erase completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Secure Erase FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Secure Erase FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 
 }
 
 mmcSecureTrim1() {
 
 	drive="$1"
-	mmc erase secure-trim1 0 $(getSectors "$drive") /dev/"$drive"
+	mmc erase secure-trim1 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc_pid=$!
+	wait "$mmc_pid"
+	
+	exit_code=$?
+
+	case "$exit_code" in
+		0)
+			echo "MMC Secure Trim (1) completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Secure Trim (1) FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Secure Trim (1) FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 
 }
 
 mmcSecureTrim2() {
 
 	drive="$1"
-	mmc erase secure-trim2 0 $(getSectors "$drive") /dev/"$drive"
+	mmc erase secure-trim2 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc_pid=$!
+	wait "$mmc_pid"
+	
+	exit_code=$?
+
+	case "$exit_code" in
+		0)
+			echo "MMC Secure Trim (2) completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Secure Trim (2) FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Secure Trim (2) FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 }
 
 mmcTrim() {
 
 	drive="$1"
-	mmc erase trim 0 $(getSectors "$drive") /dev/"$drive"
+	mmc erase trim 0 $(getSectors "$drive") /dev/"$drive" &
+	exit_code=$?
+	mmc_pid=$!
+	wait "$mmc_pid"
+	
+	exit_code=$?
+
+	case "$exit_code" in
+		0)
+			echo "MMC Trim completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Trim FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Trim FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 
 }
 
 mmcDiscard() {
 
 	drive="$1"
-	mmc erase discard 0 $(getSectors "$drive") /dev/"$drive"
+	mmc erase discard 0 $(getSectors "$drive") /dev/"$drive" &
+	exit_code=$?
+	mmc_pid=$!
+	wait "$mmc_pid"
+	
+	exit_code=$?
+
+	case "$exit_code" in
+		0)
+			echo "MMC Discard completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Discard FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Discard FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 }
 
 mmcLegacy() {
 
 	drive="$1"
-	mmc erase legacy 0 $(getSectors "$drive") /dev/"$drive"
+	mmc erase legacy 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc_pid=$!
+	wait "$mmc_pid"
+	
+	exit_code=$?
+
+		case "$exit_code" in
+		0)
+			echo "MMC Erase Legacy completed." > "$TMP_PROGRESS"
+			return 0
+			;;
+		1)
+			echo "MMC Erase Legacy FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+		*)
+			echo "MMC Erase Legacy FAILED." > "$TMP_PROGRESS"
+			return 1
+			;;
+	esac
 
 }
