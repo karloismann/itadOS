@@ -19,6 +19,7 @@ model=""
 
 #
 # Gets disk description
+# Used to show the information for the operator in whiptail
 #
 diskDescription() {
     echo "$size" "$serial" "$type" "$rota" "$tran" "$model"
@@ -37,9 +38,9 @@ getChosenDisks() {
     while IFS= read -r line; do
         name=$(echo "$line" | awk '{print $1}')
         size=$(echo "$line" | awk '{print $2}')
-        #serial=$(echo "$line" | awk '{print $3}') # UNCOMMENT IF BROKEN
-        #type=$(echo "$line" | awk '{print $4}') # UNCOMMENT IF BROKEN
-        #rota=$(echo "$line" | awk '{print $5}') # UNCOMMENT IF BROKEN
+        #serial=$(echo "$line" | awk '{print $3}')
+        #type=$(echo "$line" | awk '{print $4}')
+        #rota=$(echo "$line" | awk '{print $5}')
         tran=$(echo "$line" | awk '{print $6}') 
         # Print everything after 7th column
         model=$(echo "$line" | awk '{

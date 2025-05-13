@@ -7,6 +7,8 @@
 
   <!-- PARAMETERS -->
   <xsl:param name="generatedAt"/>
+  <xsl:param name="xmlFileName"/>
+  <xsl:param name="xmlFileHash"/>
 
   <xsl:template match="/report">
     <fo:root>
@@ -32,11 +34,34 @@
         </fo:static-content>
 
         <!-- FOOTER -->
+
         <fo:static-content flow-name="xsl-region-after">
-          <fo:block text-align="center" font-size="8pt">
-            Page <fo:page-number/> of <fo:page-number-citation ref-id="last-page"/>
-            | Generated: <xsl:value-of select="$generatedAt"/>
-          </fo:block>
+          <fo:table table-layout="fixed" width="100%">
+            <fo:table-column column-width="70%"/>
+            <fo:table-column column-width="30%"/>
+            <fo:table-body>
+              <fo:table-row>
+
+                <!-- Left column: hash info -->
+                <fo:table-cell>
+                  <fo:block font-size="8pt" font-style="italic" text-align="left">
+                    This report corresponds to XML file: <xsl:value-of select="$xmlFileName"/>
+                  </fo:block>
+                  <fo:block font-size="8pt" font-style="italic" text-align="left">
+                    XML SHA-256 Digest: <xsl:value-of select="$xmlFileHash"/>
+                  </fo:block>
+                </fo:table-cell>
+
+                <!-- Right column: logo -->
+                <fo:table-cell>
+                  <fo:block text-align="right" font-size="8pt">
+                    Page <fo:page-number/> of <fo:page-number-citation ref-id="last-page"/>
+                    | Generated: <xsl:value-of select="$generatedAt"/>
+                  </fo:block>
+                </fo:table-cell>
+              </fo:table-row>
+            </fo:table-body>
+          </fo:table>
         </fo:static-content>
         
         <!-- BODY -->
@@ -66,7 +91,7 @@
           <!-- IF NO ERASURE OCCURS -->
           <xsl:if test="status">
             <fo:block color="red" font-weight="bold" space-before="10pt">
-              Status: <xsl:value-of select="status"/>
+              <xsl:value-of select="status"/>
             </fo:block>
           </xsl:if>
 
@@ -78,6 +103,13 @@
             <xsl:if test="chosenDiskWarning">
               <fo:block font-size="8pt" color="red" font-weight="bold" space-before="2pt">
                 <xsl:value-of select="chosenDiskWarning"/>
+              </fo:block>
+            </xsl:if>
+
+            <!-- WARN BOOT DISK IS ATTACHED -->
+            <xsl:if test="bootDiskWarning">
+              <fo:block font-size="8pt" color="red" font-weight="bold" space-before="2pt">
+                <xsl:value-of select="bootDiskWarning"/>
               </fo:block>
             </xsl:if>
 

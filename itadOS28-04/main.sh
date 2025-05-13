@@ -49,16 +49,22 @@ case $CHOSEN_DISK_STATUS in
     # If 'OK' is pressed and no disks are selected then only getting specifications.
     # If disks are selected then the erasure will start
     0)  
-        if [[ "$CHOSEN_DISKS_COUNT" -le 0 ]]; then
+        if [[ "$CHOSEN_DISKS_COUNT" -le 0 && "$ATTACHED_DISKS_COUNT" -eq 0 ]]; then
+            whiptail --msgbox "Disks were not detected.. Getting specifications." 0 0
+        elif [[ "$CHOSEN_DISKS_COUNT" -le 0 ]]; then
             whiptail --msgbox "Disks were not selected.. Getting specifications." 0 0
         else
             echo "$CHOSEN_DISKS_COUNT"
             processWithVerification
         fi
     ;;
-    1)
+    1)  
         # If 'Cancel' is pressed then only getting specifications.
-        whiptail --msgbox "Erasure cancelled.. Getting specifications." 0 0
+        if [[ "$ATTACHED_DISKS_COUNT" -eq 0 ]]; then
+            whiptail --msgbox "Disks were not detected.. Getting specifications." 0 0
+        else
+            whiptail --msgbox "Erasure cancelled.. Getting specifications." 0 0
+        fi
     ;;
     *)  
         # If 'Esc' is pressed or error occurred then only getting specifications.

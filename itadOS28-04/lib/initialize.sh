@@ -10,5 +10,7 @@ initialize() {
     > lib/files/tmp/chosenDisks.txt
     > lib/files/tmp/chosenDisksDesc.txt
     > lib/files/tmp/usbDrives.txt
-
+    if [ -f "lib/files/reports/gitkeep" ]; then
+        rm -f "lib/files/reports/gitkeep"
+    fi
 }

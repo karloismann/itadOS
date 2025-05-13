@@ -3,16 +3,29 @@ TMP_REPORTS="lib/files/tmp/reports/"
 TMP_VERIFICATION="lib/files/tmp/verificationStatus/"
 ATTACHED_DISKS="lib/files/tmp/attachedDisks.txt"
 
+HASH=""
+REPORT_NAME=""
+
+
 #
 # Create a PDF report from the xml report
 # sytlesheet is at lib/files/stylesheet/reportStyle.xsl
 #
 reportToPDF() {
-    xsltproc --stringparam generatedAt "$(date '+%d-%m-%Y %H:%M')" lib/files/stylesheet/reportStyle.xsl "lib/files/reports/$ASSET_TAG.xml" > tmp.fo
-    #xsltproc --stringparam generatedAt "$(date '+%d-%m-%Y %H:%M')" lib/files/stylesheet/reportStyle.xsl "lib/files/reports/$ASSET_TAG.xml" > tmp.fo
+
+    # Generate hash of completed XML file
+    hashOfXML
+
+    xsltproc \
+        --stringparam generatedAt "$(date '+%d-%m-%Y %H:%M')" \
+        --stringparam xmlFileName "$REPORT_NAME" \
+        --stringparam xmlFileHash "$HASH" \
+        lib/files/stylesheet/reportStyle.xsl "lib/files/reports/$ASSET_TAG.xml" > tmp.fo
+
     fop tmp.fo "lib/files/reports/$ASSET_TAG.pdf"
     rm tmp.fo
 }
+
 
 #
 # Get information about processed disks and insert it into the report
@@ -100,17 +113,31 @@ reportGenerator() {
     echo "  <biosTime>$(date +"%d-%m-%Y %H:%M")</biosTime>" >> "$REPORT"
 
     if [ -z "$(ls -A "$TMP_REPORTS")" ]; then
+    
+        # IF storage drives not detected then set the status accordingly
         if [ ! -s "${ATTACHED_DISKS}" ]; then
-            echo "  <status>Storage drives NOT detected.</status>" >> "$REPORT"
+            # If boot drive is attached then mention why its not detected
+            if [ "${BOOT_DRIVE+x}" ]; then
+                echo "  <status>Storage drives NOT detected (Boot drive excluded: ${BOOT_DRIVE}).</status>" >> "$REPORT"
+            else
+                echo "  <status>Storage drives NOT detected.</status>" >> "$REPORT"
+            fi
         else
             echo "  <status>Erasure cancelled.</status>" >> "$REPORT"
         fi
+        
     else
         
         # If processing less disks than detected, insert warning
         if [[ -n ${CHOSEN_DISK_WARNING} ]]; then
             echo "  <chosenDiskWarning>${CHOSEN_DISK_WARNING}</chosenDiskWarning>" >> "$REPORT"
         fi
+
+        # If Boot disk is attached during wiping then identify the disk
+        if [[ -n ${BOOT_DISK_WARNING} ]]; then
+            echo "  <bootDiskWarning>${BOOT_DISK_WARNING}</bootDiskWarning>" >> "$REPORT"
+        fi
+
         insertDiskInfo
     fi
 
@@ -130,4 +157,11 @@ reportGenerator() {
 
     reportToPDF
 
+}
+
+# Generate hash of completed XML file
+hashOfXML() {
+    REPORT="lib/files/reports/$ASSET_TAG.xml"
+    REPORT_NAME="${ASSET_TAG}.xml"
+    HASH=$(sha256sum "$REPORT" | awk '{print $1}')
 }

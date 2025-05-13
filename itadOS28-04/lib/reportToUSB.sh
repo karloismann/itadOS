@@ -67,11 +67,11 @@ reportToUSB() {
     while true; do
 
         getUSBDrives
-        if [ "$exit_status" -eq 1 ]; then
+        if [[ "$exit_status" == "1" ]]; then
             break
         fi
 
-        if [ "$choice" != "" ]; then
+        if [[ "$choice" != "" ]]; then
         # Define partition, assuming 1
         partition="/dev/${choice}1"
 

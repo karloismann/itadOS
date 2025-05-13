@@ -5,6 +5,24 @@
 #
 
 
+# Check if all sectors are accessible
+checkSectors() {
+	disk="$1"
+
+	CURRENT_SECTORS=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $1}' | tr -d ',')
+	MAX_SECTORS=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $2}' | tr -d ',')
+	
+	export CURRENT_SECTORS
+	export MAX_SECTORS
+
+	if [[ "$CURRENT_SECTORS" == "$MAX_SECTORS" ]]; then
+		return 0
+	else 
+		return 1
+	fi
+	
+}
+
 #
 # Detect and clear HPA area
 # Param $1 disk to check
@@ -26,11 +44,23 @@ checkAndRemoveHPA() {
 
 		case "$exit_code" in
 			0)
-				MESSAGE_HPA="Erasure SUCCESS"
+				if checkSectors "$disk"; then
+					MESSAGE_HPA="Erasure SUCCESS"
+				else
+					MESSAGE_HPA="Erasure FAIL"
+				fi
 				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
 				;;
 			1)
 				MESSAGE_HPA="Erasure FAIL"
+				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
+				;;
+			16)
+				if checkSectors "$disk"; then
+					MESSAGE_HPA="Erasure SUCCESS"
+				else
+					MESSAGE_HPA="Erasure FAIL"
+				fi
 				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
 				;;
 			*)

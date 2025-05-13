@@ -1,0 +1,1 @@
+sda   20.7G VBa2c237d9-7dfca36e disk    1 sata   VBOX HARDDISK
