@@ -26,21 +26,21 @@ checkAndRemoveHPA() {
 
 		case "$exit_code" in
 			0)
-				MESSAGE_HPA="HPA erased"
+				MESSAGE_HPA="Erasure SUCCESS"
 				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
 				;;
 			1)
-				MESSAGE_HPA="HPA failed to erase"
+				MESSAGE_HPA="Erasure FAIL"
 				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
 				;;
 			*)
-				MESSAGE_HPA="HPA failed to erase"
+				MESSAGE_HPA="Erasure FAIL"
 				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
 				;;
 		esac
 
 	else
-		MESSAGE_HPA="HPA not detected"
+		MESSAGE_HPA="Not detected"
 		echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
 		return 0
 	fi
@@ -65,7 +65,7 @@ checkAndRemoveDCO() {
 
 	# If unreadable or fake DCO value, skip
 	if [[ -z "$dco_max" || "$dco_max" == "1" ]]; then
-        MESSAGE_DCO="DCO support not available or unreadable."
+        MESSAGE_DCO="Support not available or unreadable."
 		echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
 		return 1
     fi
@@ -77,20 +77,20 @@ checkAndRemoveDCO() {
 
 		case "$exit_code" in
 			0)
-        		MESSAGE_DCO="DCO has been restored."
+        		MESSAGE_DCO="Restore SUCCESS"
 				echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
         		return 0
 				;;
 
 			*)
-        		MESSAGE_DCO="DCO restore failed."
+        		MESSAGE_DCO="Restore FAIL"
 				echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
         		return 1
 				;;
 		esac
 
     else
-        MESSAGE_DCO="DCO not enabled."
+        MESSAGE_DCO="Not enabled"
 		echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
         return 0
     fi
@@ -291,6 +291,11 @@ overwriteRandomZero() {
 	echo "Erasure completed. (Overwrite [Random > Zero])" > "$TMP_PROGRESS"
 }
 
+
+#
+# Overwrites drive with 0
+# @Param $1 disk to erase
+#
 overwriteZero() {
 	disk="$1"
 	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"

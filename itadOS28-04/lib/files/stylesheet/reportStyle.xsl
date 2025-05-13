@@ -41,36 +41,131 @@
         
         <!-- BODY -->
         <fo:flow flow-name="xsl-region-body">
+
+          <!-- TITLE -->
           <fo:block text-align="left" font-size="12pt" font-weight="bold" space-after="4pt">
             itadOS Erasure Report
           </fo:block>
-          <fo:block font-size="10pt">Asset Tag: <xsl:value-of select="assetTag"/></fo:block>
-          <fo:block font-size="10pt">Serial Number: <xsl:value-of select="serialNumber"/></fo:block>
-          <fo:block font-size="10pt">BIOS Time: <xsl:value-of select="biosTime"/></fo:block>
 
+          <fo:block font-size="10pt">
+            <fo:inline font-weight="bold">Asset Tag: </fo:inline>
+            <fo:inline><xsl:value-of select="assetTag"/></fo:inline>
+          </fo:block>
+
+          <fo:block font-size="10pt">
+            <fo:inline font-weight="bold">Serial Number: </fo:inline>
+            <fo:inline><xsl:value-of select="serialNumber"/></fo:inline>
+          </fo:block>
+
+          <fo:block font-size="10pt">
+            <fo:inline font-weight="bold">BIOS Time: </fo:inline>
+            <fo:inline><xsl:value-of select="biosTime"/></fo:inline>
+          </fo:block>
+
+
+          <!-- IF NO ERASURE OCCURS -->
           <xsl:if test="status">
             <fo:block color="red" font-weight="bold" space-before="10pt">
               Status: <xsl:value-of select="status"/>
             </fo:block>
           </xsl:if>
 
+          <!-- DISKS -->
           <xsl:if test="disks">
             <fo:block font-weight="bold" space-before="10pt">Disks:</fo:block>
+
+            <!-- WARN IF NOT ALL DETECTED DISKS ERASED -->
+            <xsl:if test="chosenDiskWarning">
+              <fo:block font-size="8pt" color="red" font-weight="bold" space-before="2pt">
+                <xsl:value-of select="chosenDiskWarning"/>
+              </fo:block>
+            </xsl:if>
+
+
             <xsl:for-each select="disks/disk">
               <fo:block font-size="10pt" space-before="5pt">
-		            <fo:block>Disk: <xsl:value-of select="diskName"/></fo:block>
-                <fo:block>Model: <xsl:value-of select="diskModel"/></fo:block>
-                <fo:block>Size: <xsl:value-of select="diskSize"/></fo:block>
-                <fo:block>Type: <xsl:value-of select="diskType"/></fo:block>
-                <fo:block>Serial: <xsl:value-of select="diskSerialNumber"/></fo:block>
+		            <fo:block>
+                <fo:inline font-weight="bold">Disk: </fo:inline>
+                <fo:inline><xsl:value-of select="diskName"/></fo:inline>
+              </fo:block>
+
+              <fo:block>
+                <fo:inline font-weight="bold">Model: </fo:inline>
+                <fo:inline><xsl:value-of select="diskModel"/></fo:inline>
+              </fo:block>
+
+              <fo:block>
+                <fo:inline font-weight="bold">Size: </fo:inline>
+                <fo:inline><xsl:value-of select="diskSize"/></fo:inline>
+              </fo:block>
+
+              <fo:block>
+                <fo:inline font-weight="bold">Type: </fo:inline>
+                <fo:inline><xsl:value-of select="diskType"/></fo:inline>
+              </fo:block>
+
+              <fo:block>
+                <fo:inline font-weight="bold">Serial: </fo:inline>
+                <fo:inline><xsl:value-of select="diskSerialNumber"/></fo:inline>
+              </fo:block>
+
                 <!-- Add HPA and DCO for sata drives -->
                 <!-- Add colours indicating success (GREEN), fail (RED), not detected (ORANGE) or not set (GREEN) -->
                 <xsl:if test="normalize-space(diskType) = 'sata SSD' or normalize-space(diskType) = 'sata HDD'">
-                    <fo:block>HPA: <xsl:value-of select="diskHPA"/></fo:block>
-                    <fo:block>DCO: <xsl:value-of select="diskDCO"/></fo:block>
+                    <xsl:choose>
+                      <xsl:when test="contains(diskHPA, 'FAIL')">
+                        <fo:block color="red">
+                          <fo:inline font-weight="bold">HPA: </fo:inline>
+                          <fo:inline font-weight="bold"><xsl:value-of select="diskHPA"/></fo:inline>
+                        </fo:block>
+                      </xsl:when>
+                      <xsl:when test="contains(diskHPA, 'SUCCESS')">
+                        <fo:block color="green">
+                          <fo:inline font-weight="bold">HPA: </fo:inline>
+                          <fo:inline font-weight="bold"><xsl:value-of select="diskHPA"/></fo:inline>
+                        </fo:block>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <fo:block color="orange">
+                          <fo:inline font-weight="bold">HPA: </fo:inline>
+                          <fo:inline font-weight="bold"><xsl:value-of select="diskHPA"/></fo:inline>
+                        </fo:block>
+                      </xsl:otherwise>
+                    </xsl:choose>
+
+                    <xsl:choose>
+                      <xsl:when test="contains(diskDCO, 'FAIL')">
+                        <fo:block color="red">
+                          <fo:inline font-weight="bold">DCO: </fo:inline>
+                          <fo:inline font-weight="bold"><xsl:value-of select="diskDCO"/></fo:inline>
+                        </fo:block>
+                      </xsl:when>
+                      <xsl:when test="contains(diskDCO, 'SUCCESS') or contains(diskDCO, 'not enabled')">
+                        <fo:block color="green">
+                          <fo:inline font-weight="bold">DCO: </fo:inline>
+                          <fo:inline font-weight="bold"><xsl:value-of select="diskDCO"/></fo:inline>
+                        </fo:block>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <fo:block color="orange">
+                          <fo:inline font-weight="bold">DCO: </fo:inline>
+                          <fo:inline font-weight="bold"><xsl:value-of select="diskDCO"/></fo:inline>
+                        </fo:block>
+                      </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:if>
-                <fo:block>Method: <xsl:value-of select="erasureMethod"/></fo:block>
-                <fo:block>Tool: <xsl:value-of select="erasureTool"/></fo:block>
+
+                <fo:block>
+                  <fo:inline font-weight="bold">Method: </fo:inline>
+                  <fo:inline><xsl:value-of select="erasureMethod"/></fo:inline>
+                </fo:block>
+
+                <fo:block>
+                  <fo:inline font-weight="bold">Tool: </fo:inline>
+                  <fo:inline><xsl:value-of select="erasureTool"/></fo:inline>
+                </fo:block>
+
+                <!-- VERIFICATION -->
                 <xsl:choose>
                   <xsl:when test="contains(erasureVerification, 'FAIL')">
                     <fo:block color="red" font-weight="bold">
@@ -83,10 +178,12 @@
                     </fo:block>
                   </xsl:otherwise>
                 </xsl:choose>
+
               </fo:block>
             </xsl:for-each>
           </xsl:if>
 
+          <!-- SYSTEM SPECS -->
           <fo:block font-size="10pt" font-weight="bold" space-before="10pt">
             System Specifications:
           </fo:block>

@@ -26,7 +26,7 @@ erasure() {
             checkAndRemoveHPA "$disk"
             checkAndRemoveDCO "$disk"
 
-            if [ "$SUPPORTS_BLOCK_ERASE" == "yes" ] && [ "$SUPPORTS_SECURE_ERASE" == "yes" ]; then
+            if [[ "$SUPPORTS_BLOCK_ERASE" == "yes" && "$SUPPORTS_SECURE_ERASE" == "yes" ]]; then
 
                 methodMessage="Method:, "
                 toolMessage="Tool:, "
@@ -39,25 +39,35 @@ erasure() {
                 secure_erase_exit_code=$?
                 
                 # Construct Method message for report
-                if [[ "$block_erase_exit_code" == 0 ]]; then
+                if [[ "$block_erase_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Block Erase"
                 else
                     methodMessage="$methodMessage Block Erase [FAILED]"
                 fi
 
-                if [[ "$secure_erase_exit_code" == 0 ]]; then
+                if [[ "$secure_erase_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Secure Erase"
                 else
                     methodMessage="$methodMessage > Secure Erase [FAILED]"
+                fi
+
+                # Log hdparm tool used
+                toolMessage="$toolMessage $(hdparm -V)"
+                
+                #Fallback Random > Zero
+                if [[ "$block_erase_exit_code" != "0" && "$secure_erase_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
                 fi
 
                 # Information for report
                 echo "$MESSAGE_HPA" >> "$TMP_REPORT"
                 echo "$MESSAGE_DCO" >> "$TMP_REPORT"
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(hdparm -V)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
 
-            elif [ "$SUPPORTS_BLOCK_ERASE" == "yes" ]; then
+            elif [[ "$SUPPORTS_BLOCK_ERASE" == "yes" ]]; then
 
                 methodMessage="Method:, "
                 toolMessage="Tool:, "
@@ -67,19 +77,29 @@ erasure() {
                 block_erase_exit_code=$?
 
                 # Construct Method message for report
-                if [[ "$block_erase_exit_code" == 0 ]]; then
+                if [[ "$block_erase_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Block Erase"
                 else
                     methodMessage="$methodMessage Block Erase [FAILED]"
+                fi
+
+                # Log hdparm tool used
+                toolMessage="$toolMessage $(hdparm -V)"
+
+                #Fallback Random > Zero
+                if [[ "$block_erase_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
                 fi
 
                 # Information for report
                 echo "$MESSAGE_HPA" >> "$TMP_REPORT"
                 echo "$MESSAGE_DCO" >> "$TMP_REPORT"
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(hdparm -V)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
 
-            elif [ "$SUPPORTS_SECURE_ERASE" == "yes" ]; then
+            elif [[ "$SUPPORTS_SECURE_ERASE" == "yes" ]]; then
 
                 methodMessage="Method:, "
                 toolMessage="Tool:, "
@@ -89,25 +109,40 @@ erasure() {
                 secure_erase_exit_code=$?
 
                 # Construct Method message for report
-                if [[ "$secure_erase_exit_code" == 0 ]]; then
+                if [[ "$secure_erase_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Secure Erase"
                 else
                     methodMessage="$methodMessage Secure Erase [FAILED]"
+                fi
+
+                # Log hdparm tool used
+                toolMessage="$toolMessage $(hdparm -V)"
+
+                #Fallback Random > Zero
+                if [[ "$secure_erase_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
                 fi
 
                 # Information for report
                 echo "$MESSAGE_HPA" >> "$TMP_REPORT"
                 echo "$MESSAGE_DCO" >> "$TMP_REPORT"
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(hdparm -V)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
             else
+                methodMessage="Method:, "
+                toolMessage="Tool:, "
+
                 # Erasure commands
                 overwriteRandomZero "$disk"
+                toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+
                 # Information for report
                 echo "$MESSAGE_HPA" >> "$TMP_REPORT"
                 echo "$MESSAGE_DCO" >> "$TMP_REPORT"
                 echo "Method:, Overwrite [Random > Zero]" >> "$TMP_REPORT"
-                echo "Tool:, $(shred --version | awk 'NR==1{print}')" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
             fi
             ;;
 
@@ -132,26 +167,45 @@ erasure() {
                 secure_erase_exit_code=$?
 
                 # Construct Method message for report
-                if [[ "$secure_erase_exit_code" == 0 ]]; then
-                    methodMessage="$methodMessage > Secure Erase"
+                if [[ "$secure_erase_exit_code" == "0" ]]; then
+                    methodMessage="$methodMessage Secure Erase"
                 else
-                    methodMessage="$methodMessage > Secure Erase [FAILED]"
+                    methodMessage="$methodMessage Secure Erase [FAILED]"
                 fi
+                
+                # Log hdparm tool used
+                toolMessage="$toolMessage $(hdparm -V)"
+
+                #Fallback Random > Zero
+                if [[ "$secure_erase_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+                fi
+
 
                 # Information for report
                 echo "$MESSAGE_HPA" >> "$TMP_REPORT"
                 echo "$MESSAGE_DCO" >> "$TMP_REPORT"
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(hdparm -V)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
 
             else
+
+                methodMessage="Method:, "
+                toolMessage="Tool:, "
+
                 # Erasure commands
                 overwriteRandomZero "$disk"
+                
+                methodMessage="$methodMessage Overwrite [Random > Zero]"
+                toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+
                 # Information for report
                 echo "$MESSAGE_HPA" >> "$TMP_REPORT"
                 echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "Method:, Overwrite [Random > Zero]" >> "$TMP_REPORT"
-                echo "Tool:, $(shred --version | awk 'NR==1{print}')" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
             fi
             return 0
             ;;
@@ -174,28 +228,84 @@ erasure() {
                 nvmeFormat_secure_exit_code=$?
 
                 # Construct Method message for report
-                if [[ "$nvmeCrypto_sanitize_exit_code" == 0 ]]; then
+                if [[ "$nvmeCrypto_sanitize_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Crypto Sanitize"
                 else
                     methodMessage="$methodMessage Crypto Sanitize [FAILED]"
                 fi
 
-                if [[ "$nvme_sanitize_exit_code" == 0 ]]; then
+                if [[ "$nvme_sanitize_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Sanitize"
                 else
                     methodMessage="$methodMessage > Sanitize [FAILED]"
                 fi
 
-                if [[ "$nvmeFormat_secure_exit_code" == 0 ]]; then
+                if [[ "$nvmeFormat_secure_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Secure Format"
                 else
                     methodMessage="$methodMessage > Secure Format [FAILED]"
                 fi
 
+                # Log NVMe cli tool used
+                toolMessage="$toolMessage $(nvme --version)"
+
+                #Fallback Random > Zero
+                if [[ "$nvmeCrypto_sanitize_exit_code" != "0" && "$nvme_sanitize_exit_code" != "0" && "$nvmeFormat_secure_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+                fi
 
                 # Information for report
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(nvme --version)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
+
+                
+
+            elif nvmeSupportsCommand "$disk" "cryptoSanitize"; then
+
+                methodMessage="Method:, "
+                toolMessage="Tool:, "
+
+                # Erasure commands
+                nvmeCryptoSanitize "$disk"
+                nvmeCrypto_sanitize_exit_code=$? "$disk"
+                
+                # Construct Method message for report
+                if [[ "$nvmeCrypto_sanitize_exit_code" == "0" ]]; then
+                    methodMessage="$methodMessage Crypto Sanitize"
+                    # Log NVMe cli tool used
+                    toolMessage="$toolMessage $(nvme --version)"
+                    
+                    # Zero pass after Crypto Secure Format
+                    overwriteZero "$disk"
+                    methodMessage="$methodMessage > Overwrite [Zero]"
+                    # Log overwrite tool used
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+
+                else
+
+                    methodMessage="$methodMessage Crypto Sanitize [FAILED]"
+                    # Log NVMe cli tool used
+                    toolMessage="$toolMessage $(nvme --version)"
+
+                fi
+
+                #Fallback Random > Zero
+                if [[ "$nvmeCrypto_sanitize_exit_code" != "0" ]]; then
+
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+
+                fi
+
+
+                # Information for report
+                echo "$methodMessage" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
+
+
 
             elif nvmeSupportsCommand "$disk" "secureFormat" && nvmeSupportsCommand "$disk" "cryptoSecureFormat"; then
 
@@ -210,22 +320,33 @@ erasure() {
                 nvmeFormat_secure_exit_code=$?
                 
                 # Construct Method message for report
-                if [[ "$nvmeFormat_crypto_exit_code" == 0 ]]; then
+                if [[ "$nvmeFormat_crypto_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Crypto Format"
                 else
                     methodMessage="$methodMessage Crypto Format [FAILED]"
                 fi
 
-                if [[ "$nvmeFormat_secure_exit_code" == 0 ]]; then
+                if [[ "$nvmeFormat_secure_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Secure Format"
                 else
                     methodMessage="$methodMessage > Secure Format [FAILED]"
                 fi
 
+                # Log NVMe cli tool used
+                toolMessage="$toolMessage $(nvme --version)"
+
+                #Fallback Random > Zero
+                if [[ "$nvmeFormat_crypto_exit_code" != "0" && "$nvmeFormat_secure_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+                fi
+
 
                 # Information for report
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(nvme --version)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
+
 
             elif nvmeSupportsCommand "$disk" "sanitize"; then
 
@@ -240,21 +361,76 @@ erasure() {
                 nvmeFormat_secure_exit_code=$?
 
                 # Construct Method message for report
-                if [[ "$nvme_sanitize_exit_code" == 0 ]]; then
+                if [[ "$nvme_sanitize_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Sanitize"
                 else
                     methodMessage="$methodMessage Sanitize [FAILED]"
                 fi
 
-                if [[ "$nvmeFormat_secure_exit_code" == 0 ]]; then
+                if [[ "$nvmeFormat_secure_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Secure Format"
                 else
                     methodMessage="$methodMessage > Secure Format [FAILED]"
                 fi
 
+                # Log NVMe cli tool used
+                toolMessage="$toolMessage $(nvme --version)"
+
+                #Fallback Random > Zero
+                if [[ "$nvme_sanitize_exit_code" != "0" && "$nvmeFormat_secure_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+                fi
+
                 # Information for report
                 echo "$methodMessage" >> "$TMP_REPORT"
-                echo "Tool:, $(nvme --version)" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
+
+
+                elif nvmeSupportsCommand "$disk" "cryptoSecureFormat"; then
+
+                methodMessage="Method:, "
+                toolMessage="Tool:, "
+
+                # Erasure commands
+                nvmeFormatCrypto "$disk"
+                nvmeFormat_crypto_exit_code=$?
+                
+                # Construct Method message for report
+                if [[ "$nvmeFormat_crypto_exit_code" == "0" ]]; then
+
+                    methodMessage="$methodMessage Crypto Format"
+                    # Log NVMe cli tool used
+                    toolMessage="$toolMessage $(nvme --version)"
+                    
+                    # Zero pass after Crypto Secure Format
+                    overwriteZero "$disk"
+                    methodMessage="$methodMessage > Overwrite [Zero]"
+                    # Log overwrite tool used
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+
+                else
+
+                    methodMessage="$methodMessage Crypto Format [FAILED]"
+                    # Log NVMe cli tool used
+                    toolMessage="$toolMessage $(nvme --version)"
+
+                fi
+
+
+                #Fallback Random > Zero
+                if [[ "$nvmeFormat_crypto_exit_code" != "0" ]]; then
+                    overwriteRandomZero "$disk"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
+                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+                fi
+
+
+                # Information for report
+                echo "$methodMessage" >> "$TMP_REPORT"
+                echo "$toolMessage" >> "$TMP_REPORT"
+
 
             elif nvmeSupportsCommand "$disk" "secureFormat"; then
 
@@ -266,14 +442,19 @@ erasure() {
                 nvmeFormat_secure_exit_code=$?
 
                 # Construct Method message for report
-                if [[ "$nvmeFormat_secure_exit_code" == 0 ]]; then
+                if [[ "$nvmeFormat_secure_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Secure Format"
-                    toolMessage="$toolMessage $(nvme --version)"
                 else
                     methodMessage="$methodMessage Secure Format [FAILED]"
-                    # If format fails, fallback to overwrite. This is common for thinkpads with NVMe drives.
+                fi
+                
+                # Log NVMe cli tool used
+                toolMessage="$toolMessage $(nvme --version)"
+
+                #Fallback Random > Zero
+                if [[ "$nvmeFormat_secure_exit_code" != "0" ]]; then
                     overwriteRandomZero "$disk"
-                    methodMessage="$methodMessage > Overwrite [Random > Zero]"
+                    methodMessage="$methodMessage > Fallback Overwrite [Random > Zero]"
                     toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
                 fi
 
@@ -284,6 +465,7 @@ erasure() {
             ;;
 
         emmc)
+
             # Get mmc-utils tool information
             tool=$(apt show mmc-utils | awk '/Package:/ {print $2}')
 		    version=$(apt show mmc-utils | awk '/Version:/ {print $2}')
@@ -306,30 +488,31 @@ erasure() {
             mmcSecure_trim1_exit_code=$?
 
             # Construct Method message for report
-            if [[ "$mmcSanitize_exit_code" == 0 ]]; then
+            if [[ "$mmcSanitize_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage Sanitize"
                 else
                     methodMessage="$methodMessage Sanitize [FAILED]"
             fi
 
-            if [[ "$mmcSecure_erase_exit_code" == 0 ]]; then
+            if [[ "$mmcSecure_erase_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Secure Erase"
                 else
                     methodMessage="$methodMessage > Secure Erase [FAILED]"
             fi
 
-            if [[ "$mmcDiscard_exit_code" == 0 ]]; then
+            if [[ "$mmcDiscard_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Discard"
                 else
                     methodMessage="$methodMessage > Discard [FAILED]"
             fi
 
-            if [[ "$mmcSecure_trim1_exit_code" == 0 ]]; then
+            if [[ "$mmcSecure_trim1_exit_code" == "0" ]]; then
                     methodMessage="$methodMessage > Secure Trim (1)"
                 else
                     methodMessage="$methodMessage > Secure Trim (1) [FAILED]"
             fi
             
+            # Log mmc-util tool used
             toolMessage="${toolMessage} ${mmcTool}"
 
             # If the MMC tools succeed, Zero disk, otherwise random + zero
@@ -353,14 +536,23 @@ erasure() {
             ;;
 
         *)  
+
+            methodMessage="Method:, "
+            toolMessage="Tool:, "
+
             # Erasure commands
             overwriteRandomZero "$disk"
+            methodMessage="$methodMessage Overwrite [Random > Zero]"
+            toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+
             # Information for report
-            echo "Method:, Overwrite [Random > Zero]" >> "$TMP_REPORT"
-            echo "Tool:, $(shred --version | awk 'NR==1{print}')" >> "$TMP_REPORT"
+            echo "$methodMessage" >> "$TMP_REPORT"
+            echo "$toolMessage" >> "$TMP_REPORT"
             return 0
             ;;
     esac
 
 }
+
+
 

@@ -32,10 +32,10 @@ source lib/erasure.sh
 #erasureProgressTUI - erasure progress indicators with whiptail --msgbox
 #erasureProgress - erasure progress indicators in terminal
 source lib/erasureProgress.sh
-source lib/verifyErasure2.sh
-source lib/reportGenerator2.sh
+source lib/verifyErasure.sh
+source lib/reportGenerator.sh
 source lib/process.sh
-source lib/reportToUSB2.sh
+source lib/reportToUSB.sh
 
 initialize
 getAssetTagRQ

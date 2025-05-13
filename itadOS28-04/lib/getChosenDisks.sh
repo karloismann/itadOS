@@ -6,6 +6,7 @@
 
 CHOSEN_DISKS="lib/files/tmp/chosenDisks.txt"
 CHOSEN_DISKS_DESC="lib/files/tmp/chosenDisksDesc.txt"
+CHOSEN_DISK_WARNING=""
 
 
 # Initialize disk descrption variables
@@ -36,10 +37,10 @@ getChosenDisks() {
     while IFS= read -r line; do
         name=$(echo "$line" | awk '{print $1}')
         size=$(echo "$line" | awk '{print $2}')
-        serial=$(echo "$line" | awk '{print $3}')
-        type=$(echo "$line" | awk '{print $4}')
-        rota=$(echo "$line" | awk '{print $5}')
-        tran=$(echo "$line" | awk '{print $6}')
+        #serial=$(echo "$line" | awk '{print $3}') # UNCOMMENT IF BROKEN
+        #type=$(echo "$line" | awk '{print $4}') # UNCOMMENT IF BROKEN
+        #rota=$(echo "$line" | awk '{print $5}') # UNCOMMENT IF BROKEN
+        tran=$(echo "$line" | awk '{print $6}') 
         # Print everything after 7th column
         model=$(echo "$line" | awk '{
             for(i=7; i<=NF; i++)
@@ -69,7 +70,13 @@ getChosenDisks() {
         disk=$(awk -v disk="$i" '{print $disk}' "$CHOSEN_DISKS")
         lsblk -d -o KNAME,SIZE,SERIAL,TYPE,ROTA,TRAN,MODEL | grep "$disk" >> "$CHOSEN_DISKS_DESC"
     done
+    
+    # Warning IF not all detected disks are not processed
+    if (( CHOSEN_DISKS_COUNT < ATTACHED_DISKS_COUNT )); then
+        CHOSEN_DISK_WARNING="Disks detected: ${ATTACHED_DISKS_COUNT}. Disks selected by user: ${CHOSEN_DISKS_COUNT}."
+    fi
 
+    export CHOSEN_DISK_WARNING
     export CHOSEN_DISK_STATUS
     export CHOSEN_DISKS_COUNT
     export CHOSEN_DISKS_DESC
