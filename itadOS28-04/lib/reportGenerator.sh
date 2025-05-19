@@ -1,5 +1,5 @@
 #!/bin/bash
-TMP_REPORTS="lib/files/tmp/reports/"
+DISK_FILES="lib/files/tmp/chosenDisks/"
 TMP_VERIFICATION="lib/files/tmp/verificationStatus/"
 ATTACHED_DISKS="lib/files/tmp/attachedDisks.txt"
 
@@ -33,19 +33,18 @@ reportToPDF() {
 #
 insertDiskInfo() {
     echo "  <disks>" >> "$REPORT"
-    for file in "$TMP_REPORTS"*; do
-        base=$(basename "$file")
-        disk=$(echo "$base" | awk -F'_' '{print $1}' | xargs)
-        diskSerialNumber=$(awk -F ',' 'NR==1 {print $7}' "$file" | xargs)
-        diskModel=$(awk -F ',' 'NR==1 {print $8}' "$file" | xargs)
+    for diskDir in "$DISK_FILES"*; do
+        disk=$(basename "$diskDir")
+        diskSerialNumber=$(cat "${diskDir}/serial.txt")
+        diskModel=$(cat "${diskDir}/model.txt")
 
         # If drive does not report model name, print UNKNOWN
         if [[ -z "$diskModel" ]]; then
             diskModel="UNKNOWN"
         fi
 
-        diskSize=$(awk -F ',' 'NR==1 {print $10}' "$file" | xargs)
-        diskType=$(awk -F ',' 'NR==1 {print $9}' "$file" | xargs)
+        diskSize=$(cat "${diskDir}/size.txt")
+        diskType=$(cat "${diskDir}/type.txt" | xargs)
 
         # If mmc does not report disk type then assign it
         if [[ "$disk" == mmc* && -z "$diskType" ]]; then
@@ -57,16 +56,16 @@ insertDiskInfo() {
         diskDCO=""
 
         #Add HPA and DCO for sata drives
-        if [[ "$diskType" = "sata SSD" || "$diskType" == "sata HDD" ]]; then
-            diskHPA=$(awk 'NR==2 {print}' "$file" | xargs)
-            diskDCO=$(awk 'NR==3 {print}' "$file" | xargs)
-            erasureMethod=$(awk -F ',' 'NR==4 {print $2}' "$file" | xargs)
-            erasureTool=$(awk -F ',' 'NR==5 {print $2}' "$file" | xargs)
-            erasureVerification=$(awk -F ':' 'NR==6 {print $2}' "$file" | xargs)
+        if [[ "$diskType" == "SATA SSD" || "$diskType" == "SATA HDD" ]]; then
+            diskHPA=$(cat "${diskDir}/HPA.txt" | xargs)
+            diskDCO=$(cat "${diskDir}/DCO.txt" | xargs)
+            erasureMethod=$(cat "${diskDir}/method.txt")
+            erasureTool=$(cat "${diskDir}/tool.txt")
+            erasureVerification=$(cat "${diskDir}/verification.txt")
         else
-            erasureMethod=$(awk -F ',' 'NR==2 {print $2}' "$file" | xargs)
-            erasureTool=$(awk -F ',' 'NR==3 {print $2}' "$file" | xargs)
-            erasureVerification=$(awk -F ':' 'NR==4 {print $2}' "$file")
+            erasureMethod=$(cat "${diskDir}/method.txt")
+            erasureTool=$(cat "${diskDir}/tool.txt")
+            erasureVerification=$(cat "${diskDir}/verification.txt")
         fi
         
         # NVME report includes 2 tools and verification is on different line.
@@ -74,7 +73,7 @@ insertDiskInfo() {
             #erasureTool=$(awk -F ',' 'NR==3 {print $2}' "$file") # erasureTool returned tool2 only thus I added this here to ensure value
             tool2=$(awk 'NR==4 {print}' "$file")
             erasureTool="${erasureTool} ${tool2}" 
-            erasureVerification=$(awk -F ':' 'NR==5 {print $2}' "$file")
+            erasureVerification=$(cat "${diskDir}/verification.txt")
         fi
 
         echo "  <disk>" >> "$REPORT"
@@ -112,7 +111,7 @@ reportGenerator() {
     echo "  <serialNumber>$(dmidecode -t system | awk '/Serial Number:/ {print $3}')</serialNumber>" >> "$REPORT"
     echo "  <biosTime>$(date +"%d-%m-%Y %H:%M")</biosTime>" >> "$REPORT"
 
-    if [ -z "$(ls -A "$TMP_REPORTS")" ]; then
+    if [ -z "$(ls -A "$DISK_FILES")" ]; then
     
         # IF storage drives not detected then set the status accordingly
         if [ ! -s "${ATTACHED_DISKS}" ]; then

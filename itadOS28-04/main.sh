@@ -15,7 +15,7 @@ source lib/getAttachedDisks.sh
 #getChosenDisks - allows user to choose which disk to erase
 source lib/getChosenDisks.sh
 #getDiskType - gets chosen disks' types (nvme, sata hdd, sata ssd etc.)
-source lib/getDiskType.sh
+#source lib/getDiskType.sh
 #isDiskFrozen - checks if disk is frozen
 #suspend - suspends computer
 #wakeFromFrozen - attempts to unfreeze 3 times
@@ -36,6 +36,7 @@ source lib/verifyErasure.sh
 source lib/reportGenerator.sh
 source lib/process.sh
 source lib/reportToUSB.sh
+source lib/getDiskInfo/createDiskFolders.sh
 
 initialize
 getAssetTagRQ

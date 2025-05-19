@@ -143,7 +143,7 @@
 
                 <!-- Add HPA and DCO for sata drives -->
                 <!-- Add colours indicating success (GREEN), fail (RED), not detected (ORANGE) or not set (GREEN) -->
-                <xsl:if test="normalize-space(diskType) = 'sata SSD' or normalize-space(diskType) = 'sata HDD'">
+                <xsl:if test="normalize-space(diskType) = 'SATA SSD' or normalize-space(diskType) = 'SATA HDD'">
                     <xsl:choose>
                       <xsl:when test="contains(diskHPA, 'FAIL')">
                         <fo:block color="red">

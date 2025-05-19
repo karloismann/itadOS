@@ -3,6 +3,7 @@
 # Initialize variables
 TMP_PROGRESS="lib/files/tmp/progress"
 CHOSEN_DISKS_DESC="lib/files/tmp/chosenDisksDesc.txt"
+DISK_FILES="lib/files/tmp/chosenDisks/"
 #verifyProgressFiles="lib/files/tmp/progress/verify"
 message=""
 
@@ -21,11 +22,17 @@ erasureProgressTUI() {
         disk=$(basename "$file" | sed 's/_progress\.txt//')
 
         # Get disk size
-        size=$(awk -v d="$disk" '$1 == d {print $2}' "$CHOSEN_DISKS_DESC")
+        size="$(cat ${DISK_FILES}${disk}/size.txt)"
 
-        # Progress is received from the file
-        progress=$(sed 's/^/    /' "$file") # THIS HAS AN ISSUE NULL BYTE SUBSTITUDE
-
+        # If file not yet generated, print staring erasure, otherwise print progress
+        if [ ! -e "$file" ]; then
+            progress="Starting erasure.."
+        else
+            # Progress is received from the file
+            #progress=$(awk '{ print "    " $0 }' "$file") # THIS HAS NULL SUBSTITUDE ISSUE
+            progress=$(tr -d '\000' < "$file" | awk '{ print "    " $0 }') # POTENTIAL FIX [seems to be working]
+        fi
+        
         # Append progress message to variable
         PROGRESS_MSG+="$disk ($size):\n$progress\n\n"
     done
@@ -50,7 +57,8 @@ erasureProgress() {
         disk=$(basename "$file" | sed 's/_progress\.txt//')
 
         # Get disk size
-        size=$(awk -v d="$disk" '$1 == d {print $2}' "$CHOSEN_DISKS_DESC")
+        size="$(cat ${DISK_FILES}${disk}/size.txt | xargs)"
+        type="$(cat ${DISK_FILES}${disk}/type.txt | xargs)"
 
         # If file not yet generated, print staring erasure, otherwise print progress
         if [ ! -e "$file" ]; then
@@ -62,12 +70,16 @@ erasureProgress() {
         fi
         
         # Append progress message to variable
-        PROGRESS_MSG+="$disk ($size):\n$progress\n\n"
+        PROGRESS_MSG+="$disk $type ($size):\n$progress\n\n"
     done
 
     # Display progress
+    echo "=========================================="
+    echo "=============== itadOS ==================="
+    echo "=========================================="
+    echo ""
     echo "Erasure progress of $ASSET_TAG:"
-    echo "=========================="
+    echo "__________________________________________"
     echo ""
     echo ""
     echo -e "$PROGRESS_MSG"

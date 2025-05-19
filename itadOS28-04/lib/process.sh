@@ -5,42 +5,63 @@ processWithVerification() {
     declare -A disk_erasure_pids
     declare -A disk_verify_pids
 
-    # Initialize progress files
-    rm lib/files/tmp/progress/erasure/*
+    #
+    # Process frozen states and detect and remove hidden areas of SATA
+    #
+    for diskDir in lib/files/tmp/chosenDisks/*; do
+
+        # $disk will be used throughout the program for erasure etc.
+        local disk="$(basename "$diskDir")"
+        local DISK_FILES="lib/files/tmp/chosenDisks/"
+        local type="$(cat ${DISK_FILES}/${disk}/type.txt | xargs)"
+        
+        case "$type" in
+            "SATA SSD"|"SATA HDD")
+            
+                # Check if disk is frozen. If frozen then automatic suspension and wakes in 10 secs. tries 3 times
+                if ! isDiskFrozen "$disk"; then
+                    wakeFromFrozen "$disk"
+                fi
+
+                # Recheck frozen status 
+                if ! isDiskFrozen "$disk"; then
+                    echo "Unable to unfreeze" >> "${DISK_FILES}/${disk}/warning.txt"
+                fi
+                
+                # Sectors before erasure
+                sectorsBefore="before:  $(getSataDiskSectors "$disk" combined)"
+                echo "$sectorsBefore" >> "${DISK_FILES}/${disk}/sectors.txt"
+                
+                #Check and remove HPA and DCO
+                checkAndRemoveHPA "$disk"
+                checkAndRemoveDCO "$disk"
+
+                # Refresh disk values
+                suspend 10
+                
+                # Refresh disk size
+                getFullDiskSpecs "$disk"
+                getDiskSize "$disk"
+
+
+                
+            ;;
+            *)
+              # Sectors before erasure
+              sectorsBefore="before:  $(getDiskSectors "$disk")"
+              echo "$sectorsBefore" >> "${DISK_FILES}/${disk}/sectors.txt"
+            ;;
+        esac
+    done
 
     #
     # Get chosen disk types and start erasure
     # Collect PIDs of erasures
     #
-    for (( i=1; i<="$CHOSEN_DISKS_COUNT"; i++ )); do
+    for diskDir in lib/files/tmp/chosenDisks/*; do
 
-        # Gather disk information ($disk will be used throughout the program for erasure etc.)
-        disk="$(awk -v disk="$i"  'NR==disk {print $1}' "$CHOSEN_DISKS_DESC")"
-        size="$(awk -v disk="$i"  'NR==disk {print $2}' "$CHOSEN_DISKS_DESC")"
-        rota="$(awk -v disk="$i"  'NR==disk {print $5}' "$CHOSEN_DISKS_DESC")"
-        type="$(awk -v disk="$i"  'NR==disk {print $6}' "$CHOSEN_DISKS_DESC")"
-        serial="$(awk -v disk="$i"  'NR==disk {print $3}' "$CHOSEN_DISKS_DESC")"
-        model="$(awk -v disk="$i"  'NR==disk {for(i=7; i<=NF; i++) printf $i " "; print ""}' "$CHOSEN_DISKS_DESC")"
-        
-        # Check if type is SATA SSD or SATA HDD
-        if [[ "${type}" == "sata" && "${rota}" == "1" ]]; then
-            type="sata HDD"
-        elif [[ "${type}" == "sata" && "${rota}" == "0" ]]; then
-            type="sata SSD"
-        fi
-
-         # Create a temporary file to keep details for reporting
-        TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
-
-        # Information for report
-        echo "Disk (location, Serial Number, Model, Type, Size):" "," "$disk" "," "$serial" "," "$model" "," "$type" "," "$size" > "$TMP_REPORT"
-
-        # Look at chosen disks and get their type (nvme, sata ssd, sata hdd etc.)
-        getDiskType "$disk"
-
-        # Debug messages
-        echo "$i of $CHOSEN_DISKS_COUNT"
-        echo "$disk is type of "$DISK_TYPE""
+        # $disk will be used throughout the program for erasure etc.
+        disk="$(basename "$diskDir")"
 
         # Start erasure as a background process
         erasure "$disk" &
@@ -137,7 +158,7 @@ processWithVerification() {
                 erasureVerificationDone+="${content}"$'\n'
             done
             
-            whiptail --title "Erasure result" --msgbox "$erasureVerificationDone" 0 0
+            whiptail --title "Erasure result of ${ASSET_TAG}" --msgbox "$erasureVerificationDone" 0 0
             # Initialize verification progress files
             rm lib/files/tmp/verifyFiles/*
             break;

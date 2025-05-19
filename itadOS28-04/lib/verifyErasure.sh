@@ -14,8 +14,8 @@ verifyErasure() {
 
     TMP_NON_ZERO_BITS="lib/files/tmp/verifyFiles/"$disk"_nonZeroBits.txt"
     TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
-    TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
-    VERIFICATION_STATUS="lib/files/tmp/verificationStatus/"$disk"_verificationStatus.txt" # SEEMS TO BE UNUSED, USING IT IN DD FOR TESTING
+    DISK_FILES="lib/files/tmp/chosenDisks/"
+    VERIFICATION_STATUS="lib/files/tmp/verificationStatus/"$disk"_verificationStatus.txt"
     TMP_FIFO=$(mktemp -u)
 
     # Initialize tmp file
@@ -24,10 +24,6 @@ verifyErasure() {
     > "$VERIFICATION_STATUS"
     mkfifo "$TMP_FIFO"
 
-    #THIS WORKS
-    #dd if=/dev/$disk bs="$bs" status=progress > "$TMP_FIFO" 2> "$TMP_PROGRESS" & 
-
-    #TESTING TO FIX DUPLICATE FILE READ
     dd if=/dev/$disk bs="$bs" status=progress > "$TMP_FIFO" 2> "$VERIFICATION_STATUS" & 
     dd_pid=$!
 
@@ -68,7 +64,7 @@ verifyErasure() {
         result="Verification of ${disk}: $ERASURE_VERIFICATION"
 
         echo "$result" > "$TMP_PROGRESS"
-        echo "$result" >> "$TMP_REPORT"
+        echo "$ERASURE_VERIFICATION" > "${DISK_FILES}${disk}/verification.txt"
         echo "$result" > "$VERIFICATION_STATUS"
 
         rm "$TMP_FIFO"
@@ -81,7 +77,7 @@ verifyErasure() {
         result="Verification of ${disk}: $ERASURE_VERIFICATION"
 
         echo "$result" > "$TMP_PROGRESS"
-        echo "$result" >> "$TMP_REPORT"
+        echo "$ERASURE_VERIFICATION" > "${DISK_FILES}${disk}/verification.txt"
         echo "$result" > "$VERIFICATION_STATUS"
 
         rm "$TMP_FIFO"

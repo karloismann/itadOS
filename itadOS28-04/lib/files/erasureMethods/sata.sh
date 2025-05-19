@@ -6,16 +6,13 @@
 
 
 # Check if all sectors are accessible
-checkSectors() {
-	disk="$1"
+# Param $1 sector to compare
+# Param $2 sector to compare
+compareSectors() {
+	local sector1="$1"
+	local sector2="$2"
 
-	CURRENT_SECTORS=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $1}' | tr -d ',')
-	MAX_SECTORS=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $2}' | tr -d ',')
-	
-	export CURRENT_SECTORS
-	export MAX_SECTORS
-
-	if [[ "$CURRENT_SECTORS" == "$MAX_SECTORS" ]]; then
+	if [[ "$sector1" == "$sector2" ]]; then
 		return 0
 	else 
 		return 1
@@ -23,59 +20,86 @@ checkSectors() {
 	
 }
 
+# Get disk sector information
+# Param $1 disk to process
+# Param $2:
+# current - get currently available sectors
+# max - get all sectors
+# combined - get currentSectors/maxSectors
+# dco_max - get DCO sectors
+getSataDiskSectors() {
+    local disk="$1"
+    local sectors="$2"
+
+    case "$sectors" in
+        current)
+            local current_sectors=$(hdparm -N "/dev/${disk}" | awk '/max/{print $4}' | awk  -F '/' '{print $1}' | tr -d ',')
+            echo "$current_sectors"
+        ;;
+        max)
+	        local max_sectors=$(hdparm -N "/dev/${disk}" | awk '/max/{print $4}' | awk  -F '/' '{print $2}' | tr -d ',')
+            echo "$max_sectors"
+        ;;
+        dco_max)
+            local dco_max=$(hdparm --dco-identify "/dev/${disk}" |awk '/max sectors/ {print $4}' | xargs | tr -d ',')
+            echo "$dco_max"
+        ;;
+		combined)
+            local current_sectors=$(hdparm -N "/dev/${disk}" | awk '/max/{print $4}' | awk  -F '/' '{print $1}' | tr -d ',')
+			local max_sectors=$(hdparm -N "/dev/${disk}" | awk '/max/{print $4}' | awk  -F '/' '{print $2}' | tr -d ',')
+            echo "${current_sectors}/${max_sectors}"
+        ;;
+        *)
+            echo "Unknown command: $sectors"
+            return 1
+        ;;
+    esac
+
+}
+
 #
 # Detect and clear HPA area
 # Param $1 disk to check
 #
 checkAndRemoveHPA() {
-	disk="$1"
-	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
-	TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
+	local disk="$1"
+	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+	local DISK_FILES="lib/files/tmp/chosenDisks/${disk}/HPA.txt"
 
-	MESSAGE_HPA=""
+	local MESSAGE_HPA
 
-	current_sectors=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $1}' | tr -d ',')
-	max_sectors=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $2}' | tr -d ',')
+	local current_sectors=$(getSataDiskSectors "$disk" current)
+	local max_sectors=$(getSataDiskSectors "$disk" max)
 
 	# If HPA detected then erase, otherwise let user know HPA is not used
 	if [[ "$current_sectors" != "$max_sectors" ]]; then
-		hdparm -N "p${max_sectors}" /dev/${disk} > "${TMP_PROGRESS}" 2>&1
-		exit_code=$?
+		hdparm --yes-i-know-what-i-am-doing -N"p${max_sectors}" /dev/${disk} > "${TMP_PROGRESS}" 2>&1
+		local exit_code=$?
+
+		# Recheck currently available sectors
+		current_sectors=$(getSataDiskSectors "$disk" current)
 
 		case "$exit_code" in
-			0)
-				if checkSectors "$disk"; then
+			0|16)
+				if compareSectors "$current_sectors" "$max_sectors"; then
 					MESSAGE_HPA="Erasure SUCCESS"
 				else
 					MESSAGE_HPA="Erasure FAIL"
 				fi
-				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
+				echo "$MESSAGE_HPA" > "${DISK_FILES}"
 				;;
-			1)
+			1|*)
 				MESSAGE_HPA="Erasure FAIL"
-				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
-				;;
-			16)
-				if checkSectors "$disk"; then
-					MESSAGE_HPA="Erasure SUCCESS"
-				else
-					MESSAGE_HPA="Erasure FAIL"
-				fi
-				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
-				;;
-			*)
-				MESSAGE_HPA="Erasure FAIL"
-				echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
+				echo "$MESSAGE_HPA" > "${DISK_FILES}"
 				;;
 		esac
 
 	else
 		MESSAGE_HPA="Not detected"
-		echo "$MESSAGE_HPA" > "${TMP_PROGRESS}"
+		echo "$MESSAGE_HPA" > "${DISK_FILES}"
 		return 0
 	fi
 
-	export MESSAGE_HPA
 }
 
 
@@ -84,48 +108,56 @@ checkAndRemoveHPA() {
 # Param $1 disk to check
 #
 checkAndRemoveDCO() {
-	disk="$1"
-	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
-	TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
+	local disk="$1"
+	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+	local DISK_FILES="lib/files/tmp/chosenDisks/${disk}/DCO.txt"
 
-	MESSAGE_DCO=""
+	local MESSAGE_DCO
 
-	max_sectors=$(hdparm -N /dev/${disk} | awk '/max/{print $4}' | awk  -F '/' '{print $2}' | tr -d ',')
-	dco_max=$(hdparm --dco-identify "/dev/${disk}" |awk '/Maximum LBA/ {print $3}' | tr -d ',')
+	local max_sectors=$(getSataDiskSectors "$disk" max)
+	local dco_max=$(getSataDiskSectors "$disk" dco_max)
+	
 
 	# If unreadable or fake DCO value, skip
 	if [[ -z "$dco_max" || "$dco_max" == "1" ]]; then
         MESSAGE_DCO="Support not available or unreadable."
-		echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
-		return 1
+		echo "$MESSAGE_DCO" > "${DISK_FILES}"
+		return 2
     fi
 
 	# Compare real vs DCO
 	if (( max_sectors < dco_max )); then
 		sudo hdparm --yes-i-know-what-i-am-doing --dco-restore /dev/"$disk"
-		exit_code=$?
+		local exit_code=$?
+
+		# Recheck currently available sectors
+		local dco_max=$(getSataDiskSectors "$disk" dco_max)
 
 		case "$exit_code" in
-			0)
-        		MESSAGE_DCO="Restore SUCCESS"
-				echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
-        		return 0
-				;;
+			0)	
+				if compareSectors "$max_sectors" "$dco_max"; then
+        			MESSAGE_DCO="Restore SUCCESS"
+					echo "$MESSAGE_DCO" > "${DISK_FILES}"
+					return 0
+				else
+					MESSAGE_DCO="Restore FAIL"
+					echo "$MESSAGE_DCO" > "${DISK_FILES}"
+        			return 1
+				fi
+			;;
 
 			*)
         		MESSAGE_DCO="Restore FAIL"
-				echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
+				echo "$MESSAGE_DCO" > "${DISK_FILES}"
         		return 1
 				;;
 		esac
 
     else
         MESSAGE_DCO="Not enabled"
-		echo "$MESSAGE_DCO" > "${TMP_PROGRESS}"
+		echo "$MESSAGE_DCO" > "${DISK_FILES}"
         return 0
     fi
-
-	export MESSAGE_DCO
 
 }
 
@@ -136,25 +168,24 @@ checkAndRemoveDCO() {
 # @Returns FROZEN status
 #
 isDiskFrozen() {
-    disk="$1"
+    local disk="$1"
 
-    FROZEN=$(hdparm -I /dev/"$disk" | awk '/frozen/{print $1}')
-    case "$FROZEN" in
+    local frozen=$(hdparm -I /dev/"$disk" | awk '/frozen/{print $1}')
+    case "$frozen" in
         frozen)
-            FROZEN="yes"
+			echo "yes"
             return 1
             ;;
         not)
-            FROZEN="no"
+			echo "no"
             return 0
             ;;
         *)
-            FROZEN="UNKNOWN"
+			echo "UNKNOWN"
             return 1
             ;;
     esac
 
-    export FROZEN
 }
 
 # 
@@ -162,7 +193,7 @@ isDiskFrozen() {
 # @Param $1 amount of seconds for suspend
 #
 suspend() {
-    sec=$1
+    local sec=$1
     rtcwake -m mem -s "$sec"
 }
 
@@ -172,14 +203,13 @@ suspend() {
 #
 wakeFromFrozen() {
 
-    disk="$1"
+    local disk="$1"
 
-    if [[ "$FROZEN" != "no" ]]; then
+    if [[ $(isDiskFrozen "$disk") != "no" ]]; then
         for (( i=0; i<=2; i++ )); do
             suspend 10
 
-            isDiskFrozen "$disk"
-            if [[ "$FROZEN" == "no" ]]; then
+            if [[ $(isDiskFrozen "$disk") == "no" ]]; then
                 break
             fi
         done
@@ -192,19 +222,18 @@ wakeFromFrozen() {
 # @Returns 'yes' if secure erase is supported and 'no' if it is not
 #
 supportsSecureErase() {
-	disk="$1"
+	local disk="$1"
 
-	supportsCommand=$(hdparm -I /dev/"$disk" | awk '/supported/ {print $1}' | awk 'NR==2 {print}')
+	local supportsCommand=$(hdparm -I /dev/"$disk" | awk '/supported/ {print $1}' | awk 'NR==2 {print}')
 	if [[ "$supportsCommand" == "supported:" || "$supportsCommand" == "supported" ]];
 	then
-		SUPPORTS_SECURE_ERASE="yes"
+		echo "yes"
         return 0
 	else
-		SUPPORTS_SECURE_ERASE="no"
+		echo "no"
         return 1
 	fi
 
-    export SUPPORTS_SECURE_ERASE
 }
 
 #
@@ -213,20 +242,19 @@ supportsSecureErase() {
 # @Returns 'yes' if block erase is supported and 'no' if it is not
 #
 supportsBlockErase() {
-	disk="$1"
+	local disk="$1"
 
-	supportsCommand=$(hdparm -I /dev/"$disk" | awk '/BLOCK/ {print}')
+	local supportsCommand=$(hdparm -I /dev/"$disk" | awk '/BLOCK/ {print}')
 
 	if [[ -z "$supportsCommand" ]];
 	then
-		SUPPORTS_BLOCK_ERASE="no"
+		echo "no"
         return 1
 	else
-		SUPPORTS_BLOCK_ERASE="yes"
+		echo "yes"
         return 0
 	fi
 
-    export SUPPORTS_BLOCK_ERASE
 
 }
 
@@ -235,15 +263,15 @@ supportsBlockErase() {
 # @Param $1 disk to erase
 #
 secureErase() {
-	disk="$1"
-	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+	local disk="$1"
+	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
-	pass="erasure"
+	local pass="erasure"
 	echo "Secure Erase in progress... this may take a few hours." > "$TMP_PROGRESS"
 	hdparm --user-master u --security-set-pass "$pass" /dev/"$disk"
 
 	hdparm --user-master u --security-erase "$pass" /dev/"$disk"
-	exit_code=$?
+	local exit_code=$?
 
 	case "$exit_code" in
 		0)
@@ -266,14 +294,14 @@ secureErase() {
 # @Param $1 disk to erase
 #
 blockErase() {
-	disk="$1"
-	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+	local disk="$1"
+	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
 	hdparm --yes-i-know-what-i-am-doing --sanitize-block-erase /dev/"$disk"
-	exit_code=$?
+	local exit_code=$?
 
-	status=""
-	percentage=""
+	local status
+	local percentage
 
 	while [[ "$percentage" != "Operation" ]];
 	do
@@ -310,9 +338,9 @@ blockErase() {
 # @Param $1 disk to erase
 #
 overwriteRandomZero() {
-	disk="$1"
-	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
-	method="Overwrite [Random > Zero]"
+	local disk="$1"
+	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+	local method="Overwrite [Random > Zero]"
 
 	shred -n 1 -z -v /dev/"$disk" 2>&1 | while read -r line; do
         echo "$line" > "$TMP_PROGRESS"
@@ -327,9 +355,9 @@ overwriteRandomZero() {
 # @Param $1 disk to erase
 #
 overwriteZero() {
-	disk="$1"
-	TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
-	method="Overwrite [Zero]"
+	local disk="$1"
+	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+	local method="Overwrite [Zero]"
 
 	shred -n 0 -z -v /dev/"$disk" 2>&1 | while read -r line; do
         echo "$line" > "$TMP_PROGRESS"

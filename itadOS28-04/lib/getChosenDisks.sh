@@ -5,6 +5,7 @@
 #
 
 CHOSEN_DISKS="lib/files/tmp/chosenDisks.txt"
+DISK_FILES="lib/files/tmp/chosenDisks/"
 CHOSEN_DISKS_DESC="lib/files/tmp/chosenDisksDesc.txt"
 CHOSEN_DISK_WARNING=""
 
@@ -22,7 +23,7 @@ model=""
 # Used to show the information for the operator in whiptail
 #
 diskDescription() {
-    echo "$size" "$serial" "$type" "$rota" "$tran" "$model"
+    echo "$size" "$type" "$model"
 }
 
 #
@@ -41,7 +42,19 @@ getChosenDisks() {
         #serial=$(echo "$line" | awk '{print $3}')
         #type=$(echo "$line" | awk '{print $4}')
         #rota=$(echo "$line" | awk '{print $5}')
-        tran=$(echo "$line" | awk '{print $6}') 
+        tran=$(echo "$line" | awk '{print $6}')
+
+        # Get disk type
+        if [[ "${tran}" == "sata" && "${rota}" == "1" ]]; then
+            type="SATA HDD"
+        elif [[ "${tran}" == "sata" && "${rota}" == "0" ]]; then
+            type="SATA SSD"
+        elif [[ "${name}" == mmc* ]]; then
+            type="eMMC"
+        else
+            type="${tran^^}"
+        fi
+
         # Print everything after 7th column
         model=$(echo "$line" | awk '{
             for(i=7; i<=NF; i++)
@@ -63,13 +76,16 @@ getChosenDisks() {
 	echo "$chosen" | awk '{gsub(/\"/, ""); print}' > "$CHOSEN_DISKS"
     CHOSEN_DISKS_COUNT=$(awk '{print NF}' $CHOSEN_DISKS)
 
-    # Initialize files/tmp/chosenDisksDesc.txt" 
-    > "$CHOSEN_DISKS_DESC"
+    # Create directories for chosen disks
+    createDiskDir
 
-    # Populate files/tmp/chosenDisksDesc.txt" with disk information
+    # Populate disk directories with disk specifications
     for (( i=1; i<="$CHOSEN_DISKS_COUNT"; i++ )); do
         disk=$(awk -v disk="$i" '{print $disk}' "$CHOSEN_DISKS")
-        lsblk -d -o KNAME,SIZE,SERIAL,TYPE,ROTA,TRAN,MODEL | grep "$disk" >> "$CHOSEN_DISKS_DESC"
+        lsblk -d -o KNAME,SIZE,SERIAL,TYPE,ROTA,TRAN,MODEL | grep "$disk" | awk 'NR==1 {print}' > "${DISK_FILES}${disk}/specifications.txt"
+
+        # Place disk specs into specified folders
+        placeSpecsToFolders "$disk"
     done
     
     # Warning IF not all detected disks are not processed

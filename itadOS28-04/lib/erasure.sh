@@ -5,31 +5,18 @@
 #
 #
 erasure() {
-    disk="$1"
-    TMP_REPORT="lib/files/tmp/reports/"$disk"_tmp_report.txt"
-    TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+    local disk="$1"
+    local DISK_FILES="lib/files/tmp/chosenDisks/"
+    local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
+    local type="$(cat ${DISK_FILES}${disk}/type.txt | xargs)"
 
-    case "$DISK_TYPE" in
-        sata_ssd)
+    case "$type" in
+        "SATA SSD")
 
-            # Check if disk is frozen. If frozen then automatic suspension and wakes in 10 secs. tries 3 times
-            isDiskFrozen "$disk"
-            if [[ "$FROZEN" != "no" ]]; then
-                wakeFromFrozen "$disk"
-            fi
+            if supportsBlockErase "$disk" && supportsSecureErase "$disk"; then
 
-            # Check for supported erasure methods
-            supportsSecureErase "$disk"
-            supportsBlockErase "$disk"
-
-            #Check and remove HPA and DCO
-            checkAndRemoveHPA "$disk"
-            checkAndRemoveDCO "$disk"
-
-            if [[ "$SUPPORTS_BLOCK_ERASE" == "yes" && "$SUPPORTS_SECURE_ERASE" == "yes" ]]; then
-
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 blockErase "$disk"
@@ -62,15 +49,15 @@ erasure() {
                 fi
 
                 # Information for report
-                echo "$MESSAGE_HPA" >> "$TMP_REPORT"
-                echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$MESSAGE_HPA" >> "${DISK_FILES}/${disk}/HPA.txt"
+                echo "$MESSAGE_DCO" >> "${DISK_FILES}/${disk}/DCO.txt"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
-            elif [[ "$SUPPORTS_BLOCK_ERASE" == "yes" ]]; then
+            elif supportsBlockErase "$disk"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+               local methodMessage
+               local toolMessage
 
                 # Erasure commands
                 blockErase "$disk"
@@ -94,15 +81,15 @@ erasure() {
                 fi
 
                 # Information for report
-                echo "$MESSAGE_HPA" >> "$TMP_REPORT"
-                echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$MESSAGE_HPA" >> "${DISK_FILES}/${disk}/HPA.txt"
+                echo "$MESSAGE_DCO" >> "${DISK_FILES}/${disk}/DCO.txt"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
-            elif [[ "$SUPPORTS_SECURE_ERASE" == "yes" ]]; then
+            elif supportsSecureErase "$disk"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 secureErase "$disk"
@@ -126,41 +113,38 @@ erasure() {
                 fi
 
                 # Information for report
-                echo "$MESSAGE_HPA" >> "$TMP_REPORT"
-                echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$MESSAGE_HPA" >> "${DISK_FILES}/${disk}/HPA.txt"
+                echo "$MESSAGE_DCO" >> "${DISK_FILES}/${disk}/DCO.txt"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
             else
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 overwriteRandomZero "$disk"
                 toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
 
                 # Information for report
-                echo "$MESSAGE_HPA" >> "$TMP_REPORT"
-                echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "Method:, Overwrite [Random > Zero]" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$MESSAGE_HPA" >> "${DISK_FILES}/${disk}/HPA.txt"
+                echo "$MESSAGE_DCO" >> "${DISK_FILES}/${disk}/DCO.txt"
+                echo "Method: Overwrite [Random > Zero]" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
             fi
             ;;
 
-        sata_hdd)
+        "SATA HDD")
 
             # Check if disk is frozen. If frozen then automatic suspension and wakes in 10 secs. tries 3 times
             isDiskFrozen "$disk"
             if [[ "$FROZEN" != "no" ]]; then
                 wakeFromFrozen "$disk"
             fi
-
-            # Check for supported erasure methods
-            supportsSecureErase "$disk"
             
-            if [[ "$SUPPORTS_SECURE_ERASE" == "yes" ]]; then
+            if supportsSecureErase "$disk"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 secureErase "$disk"
@@ -185,15 +169,15 @@ erasure() {
 
 
                 # Information for report
-                echo "$MESSAGE_HPA" >> "$TMP_REPORT"
-                echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$MESSAGE_HPA" >> "${DISK_FILES}/${disk}/HPA.txt"
+                echo "$MESSAGE_DCO" >> "${DISK_FILES}/${disk}/DCO.txt"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
             else
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 overwriteRandomZero "$disk"
@@ -202,20 +186,20 @@ erasure() {
                 toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
 
                 # Information for report
-                echo "$MESSAGE_HPA" >> "$TMP_REPORT"
-                echo "$MESSAGE_DCO" >> "$TMP_REPORT"
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$MESSAGE_HPA" >> "${DISK_FILES}/${disk}/HPA.txt"
+                echo "$MESSAGE_DCO" >> "${DISK_FILES}/${disk}/DCO.txt"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
             fi
             return 0
             ;;
 
-        nvme)
+        "NVME")
 
             if nvmeSupportsCommand "$disk" "sanitize" && nvmeSupportsCommand "$disk" "cryptoSanitize"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 nvmeCryptoSanitize "$disk"
@@ -257,15 +241,15 @@ erasure() {
                 fi
 
                 # Information for report
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
                 
 
             elif nvmeSupportsCommand "$disk" "cryptoSanitize"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 nvmeCryptoSanitize "$disk"
@@ -302,15 +286,15 @@ erasure() {
 
 
                 # Information for report
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
 
 
             elif nvmeSupportsCommand "$disk" "secureFormat" && nvmeSupportsCommand "$disk" "cryptoSecureFormat"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 nvmeFormatCrypto "$disk"
@@ -344,14 +328,14 @@ erasure() {
 
 
                 # Information for report
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
 
             elif nvmeSupportsCommand "$disk" "sanitize"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 nvmeSanitize "$disk"
@@ -384,39 +368,39 @@ erasure() {
                 fi
 
                 # Information for report
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
 
                 elif nvmeSupportsCommand "$disk" "cryptoSecureFormat"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                    local methodMessage
+                    local toolMessage
 
-                # Erasure commands
-                nvmeFormatCrypto "$disk"
-                nvmeFormat_crypto_exit_code=$?
+                    # Erasure commands
+                    nvmeFormatCrypto "$disk"
+                    nvmeFormat_crypto_exit_code=$?
                 
-                # Construct Method message for report
-                if [[ "$nvmeFormat_crypto_exit_code" == "0" ]]; then
+                    # Construct Method message for report
+                    if [[ "$nvmeFormat_crypto_exit_code" == "0" ]]; then
 
-                    methodMessage="$methodMessage Crypto Format"
-                    # Log NVMe cli tool used
-                    toolMessage="$toolMessage $(nvme --version)"
-                    
-                    # Zero pass after Crypto Secure Format
-                    overwriteZero "$disk"
-                    methodMessage="$methodMessage > Overwrite [Zero]"
-                    # Log overwrite tool used
-                    toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
+                        methodMessage="$methodMessage Crypto Format"
+                        # Log NVMe cli tool used
+                        toolMessage="$toolMessage $(nvme --version)"
+                        
+                        # Zero pass after Crypto Secure Format
+                        overwriteZero "$disk"
+                        methodMessage="$methodMessage > Overwrite [Zero]"
+                        # Log overwrite tool used
+                        toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
 
-                else
+                    else
 
-                    methodMessage="$methodMessage Crypto Format [FAILED]"
-                    # Log NVMe cli tool used
-                    toolMessage="$toolMessage $(nvme --version)"
+                        methodMessage="$methodMessage Crypto Format [FAILED]"
+                        # Log NVMe cli tool used
+                        toolMessage="$toolMessage $(nvme --version)"
 
-                fi
+                    fi
 
 
                 #Fallback Random > Zero
@@ -428,14 +412,14 @@ erasure() {
 
 
                 # Information for report
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
 
 
             elif nvmeSupportsCommand "$disk" "secureFormat"; then
 
-                methodMessage="Method:, "
-                toolMessage="Tool:, "
+                local methodMessage
+                local toolMessage
 
                 # Erasure commands
                 nvmeFormatSecure "$disk"
@@ -459,20 +443,20 @@ erasure() {
                 fi
 
                 # Information for report
-                echo "$methodMessage" >> "$TMP_REPORT"
-                echo "$toolMessage" >> "$TMP_REPORT"
+                echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+                echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
             fi
             ;;
 
-        emmc)
+        "eMMC")
 
             # Get mmc-utils tool information
-            tool=$(apt show mmc-utils | awk '/Package:/ {print $2}')
-		    version=$(apt show mmc-utils | awk '/Version:/ {print $2}')
-            mmcTool="${tool} ${version}"
+            local tool=$(apt show mmc-utils | awk '/Package:/ {print $2}')
+		    local version=$(apt show mmc-utils | awk '/Version:/ {print $2}')
+            local mmcTool="${tool} ${version}"
 
-            methodMessage="Method:, "
-            toolMessage="Tool:, "
+            local methodMessage
+            local toolMessage
 
             # Erasure commands
             mmcSanitize "$disk"
@@ -531,14 +515,14 @@ erasure() {
             fi
 
             # Information for report
-            echo "$methodMessage" >> "$TMP_REPORT"
-            echo "$toolMessage" >> "$TMP_REPORT"
+            echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+            echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
             ;;
 
         *)  
 
-            methodMessage="Method:, "
-            toolMessage="Tool:, "
+            local methodMessage
+            local toolMessage
 
             # Erasure commands
             overwriteRandomZero "$disk"
@@ -546,8 +530,8 @@ erasure() {
             toolMessage="$toolMessage $(shred --version | awk 'NR==1{print}')"
 
             # Information for report
-            echo "$methodMessage" >> "$TMP_REPORT"
-            echo "$toolMessage" >> "$TMP_REPORT"
+            echo "$methodMessage" >> "${DISK_FILES}/${disk}/method.txt"
+            echo "$toolMessage" >> "${DISK_FILES}/${disk}/tool.txt"
             return 0
             ;;
     esac

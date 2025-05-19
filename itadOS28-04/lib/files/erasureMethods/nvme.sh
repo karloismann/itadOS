@@ -1,6 +1,20 @@
 #!/bin/bash
 
 
+#
+# Gives NVME disk sectors
+# @param $1 drive
+# @returns sectors
+#
+getNvmeDiskSectors() {
+	disk="$1"
+
+	sectors=$(nvme id-ns /dev/${disk} | awk '/nsze/{print $3}')
+	sectors=$(($sectors))
+
+	echo "$sectors"
+}
+
 # 
 # finds support for specific nvme erasure commands
 # (sanitize, cryptoSanitize, secureFormat, cryptoSecureFormat)

@@ -5,11 +5,24 @@
 # @param $1 drive
 # @returns sectors
 #
-getSectors() {
+getEmmcDiskSectors() {
     disk="$1"
 
 	sectors=$(cat /sys/block/"$disk"/size)
 	echo "$sectors"
+
+}
+
+#
+# Gives eMMC sector size
+# @param $1 drive
+# @returns sector size
+#
+getEmmcDiskSectors() {
+    disk="$1"
+
+	sectorSize=$(cat /sys/block/"$disk"/queue/hw_sector_size)
+	echo "$sectorSize"
 
 }
 
@@ -42,7 +55,7 @@ mmcSanitize() {
 mmcSecureErase() {
 
 	disk="$1"
-	mmc erase secure-erase 0 $(getSectors "$disk") /dev/"$disk" &
+	mmc erase secure-erase 0 $(getEmmcDiskSectors "$disk") /dev/"$disk" &
 	mmc_pid=$!
 	wait "$mmc_pid"
 	
@@ -68,7 +81,7 @@ mmcSecureErase() {
 mmcSecureTrim1() {
 
 	drive="$1"
-	mmc erase secure-trim1 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc erase secure-trim1 0 $(getEmmcDiskSectors "$drive") /dev/"$drive" &
 	mmc_pid=$!
 	wait "$mmc_pid"
 	
@@ -94,7 +107,7 @@ mmcSecureTrim1() {
 mmcSecureTrim2() {
 
 	drive="$1"
-	mmc erase secure-trim2 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc erase secure-trim2 0 $(getEmmcDiskSectors "$drive") /dev/"$drive" &
 	mmc_pid=$!
 	wait "$mmc_pid"
 	
@@ -119,7 +132,7 @@ mmcSecureTrim2() {
 mmcTrim() {
 
 	drive="$1"
-	mmc erase trim 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc erase trim 0 $(getEmmcDiskSectors "$drive") /dev/"$drive" &
 	exit_code=$?
 	mmc_pid=$!
 	wait "$mmc_pid"
@@ -146,7 +159,7 @@ mmcTrim() {
 mmcDiscard() {
 
 	drive="$1"
-	mmc erase discard 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc erase discard 0 $(getEmmcDiskSectors "$drive") /dev/"$drive" &
 	exit_code=$?
 	mmc_pid=$!
 	wait "$mmc_pid"
@@ -172,7 +185,7 @@ mmcDiscard() {
 mmcLegacy() {
 
 	drive="$1"
-	mmc erase legacy 0 $(getSectors "$drive") /dev/"$drive" &
+	mmc erase legacy 0 $(getEmmcDiskSectors "$drive") /dev/"$drive" &
 	mmc_pid=$!
 	wait "$mmc_pid"
 	
