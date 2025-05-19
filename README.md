@@ -3,7 +3,7 @@ itadOS is a GDPR-aware erasure tool that glues together existing Linux utilities
 
 Sample report from testing.
 Sample report from testing. Test conditions: Enabled HPA, selected sda and nvme drives for erasure, left boot USB attached.
-[HPArem5.pdf](https://github.com/user-attachments/files/20301489/HPArem5.pdf)
+![image](https://github.com/user-attachments/assets/971333e0-ed31-489f-9600-b195121e5eec)
 
 
 Test conditions: Enabled HPA, selected sda drive for erasure, left boot USB attached. (old, size false after HPA removal)
