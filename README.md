@@ -3,13 +3,6 @@
 It will permanently erase all data on storage devices and may cause irreversible changes or damage. \
 This is a an early version and will contain bugs.**
 
-**ISO DOWNLOAD:** \
-https://drive.google.com/uc?export=download&id=1sH1MbTlfzkQweXfaXBdihO05Gc6DGrdT
-
-**Report bugs and send feedback:** \
-itadoperatingsystem@gmail.com
-
-
 itadOS is a GDPR-aware data erasure tool that integrates existing Linux utilities into a functional, auditable, and user-friendly erasure system. \
 It allows the user to choose an erasure specification: \
   • clear \
@@ -28,6 +21,12 @@ It allows the user to choose an erasure specification: \
 
 The system runs from a Debian-based live USB (created using live-build).
 After booting, the USB drive can be removed, itadOS runs entirely in RAM.
+
+**ISO DOWNLOAD:** \
+https://drive.google.com/uc?export=download&id=1sH1MbTlfzkQweXfaXBdihO05Gc6DGrdT
+
+**Report bugs and send feedback:** \
+itadoperatingsystem@gmail.com
     
 **Quick guide:** 
 
