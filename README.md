@@ -41,6 +41,7 @@ Boot from the USB. Once itadOS has booted, you can safely remove the USB stick a
   • Frozen state detection and automatic recovery. \
   • Support for NVMe, SATA HDD, SATA SSD, and eMMC. \
   • Fallback overwrite for unsupported disk types. \
+  • Reports in PDF and XML formats.
   • UEFI and Legacy boot.
 
 **Dependencies:** \
