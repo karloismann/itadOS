@@ -3,7 +3,7 @@
 It will permanently erase all data on storage devices and may cause irreversible changes or damage. \
 This is a an early version and will contain bugs.**
 
-itadOS is a GDPR-aware data erasure tool that integrates existing Linux utilities into a functional, auditable, and user-friendly erasure system. \
+itadOS is a GDPR-aware data erasure tool that integrates existing Linux utilities into a streamlined, auditable, and user-friendly erasure system. \
 It allows the user to choose an erasure specification: \
   • clear \
   • purge \
