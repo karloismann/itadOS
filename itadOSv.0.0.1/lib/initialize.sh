@@ -113,9 +113,15 @@ initialize() {
     
     if [[ ! -d lib/files/tmp/logs/ ]]; then
         mkdir -p lib/files/tmp/logs/
+        mkdir lib/files/tmp/verificationStatus
         mkdir lib/files/tmp/verifyFiles
         mkdir lib/files/tmp/progress
         mkdir lib/files/tmp/chosenDisks
+        mkdir lib/files/reports
+    fi
+
+    if [[ ! -z "$BOOT_DISK_WARNING" ]]; then
+        BOOT_DISK_WARNING=""
     fi
 
     rm lib/files/tmp/verificationStatus/*
