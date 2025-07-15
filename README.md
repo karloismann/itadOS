@@ -1,10 +1,13 @@
 # itadOS
 **WARNING: Use at your own risk. \
-It will permanently erase all data on connected storage devices and may cause irreversible changes. \
+It will permanently erase all data on storage devices and may cause irreversible changes or damage. \
 This is a an early version and will contain bugs.**
 
 **ISO DOWNLOAD:** \
 https://drive.google.com/uc?export=download&id=1sH1MbTlfzkQweXfaXBdihO05Gc6DGrdT
+
+**Report bugs and send feedback:** \
+itadoperatingsystem@gmail.com
 
 
 itadOS is a GDPR-aware data erasure tool that integrates existing Linux utilities into a functional, auditable, and user-friendly erasure system. \
@@ -22,14 +25,17 @@ It allows the user to choose an erasure specification: \
     • Verification \
     • Report generation \
     • and more..
-    
+
 The system runs from a Debian-based live USB (created using live-build).
 After booting, the USB drive can be removed, itadOS runs entirely in RAM.
+    
+**Quick guide:** 
 
 Disable secure boot, set SATA to AHCI mode and allow USB boot in BIOS.
 After that simply write the ISO to a USB stick using Rufus or a similar tool.
 Name the USB (Volume label in rufus) 'ITADOS' as this enables the boot filter functionality.
-Boot from the USB. Once itadOS has booted, you can safely remove the USB stick as it is no longer required for operation, and can be used on other devices.
+Boot from the USB. Once itadOS has booted, the USB stick can safely be removed as it is no longer required for operation, and can be used on other devices.
+
 
 **UI Flow:** \
   UI flow can be seen from my Linkedin posts: https://www.linkedin.com/feed/update/urn:li:activity:7347000054961836032/
