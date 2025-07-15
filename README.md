@@ -41,7 +41,7 @@ Boot from the USB. Once itadOS has booted, the USB stick can safely be removed a
 
 **Features:** \
   • Parallel multi-disk erasure. \
-  • Automatic disk type detection and applies approptiate erasure methods accordingly. \
+  • Automatic disk type detection and applies appropriate erasure methods accordingly. \
   • Erasure verification [full, partial, skip]. \
   • SMART health test. \
   • Asynchronous erasure, verification and health test. \
