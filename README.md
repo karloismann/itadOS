@@ -13,7 +13,7 @@ It allows the user to choose an erasure specification: \
   • purge \
   • auto (falls back to clear if purge not supported) 
 
-**Design rinciples:** \
+**Design principles:** \
   • Designed for users without deep technical knowledge \
   • Automatically detects disk types and applies the most appropriate erasure method \
   • Entirely written in Bash, combining tools to automate: \
