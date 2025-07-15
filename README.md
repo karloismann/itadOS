@@ -28,7 +28,7 @@ After booting, the USB drive can be removed, itadOS runs entirely in RAM.
 
 Disable secure boot, set SATA to AHCI mode and allow USB boot in BIOS.
 After that simply write the ISO to a USB stick using Rufus or a similar tool.
-Name the USB 'ITADOS' as this enables the boot filter functionality.
+Name the USB (Volume label in rufus) 'ITADOS' as this enables the boot filter functionality.
 Boot from the USB. Once itadOS has booted, you can safely remove the USB stick as it is no longer required for operation, and can be used on other devices.
 
 **UI Flow:** \
