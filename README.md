@@ -3,7 +3,7 @@
 It will permanently erase all data on connected storage devices and may cause irreversible changes. \
 This is a an early version and will contain bugs.**
 
-ISO DOWNLOAD: \
+**ISO DOWNLOAD:** \
 https://drive.google.com/uc?export=download&id=1ygfTzOq2iRg-5R7ddh3NVmHQDC4EdTUa
 
 
@@ -63,6 +63,7 @@ Boot from the USB. Once itadOS has booted, you can safely remove the USB stick a
 
 **To do:** \
   • Modify partial erasure to meet NIST guidelines \
+  • Create comprehensive guides \
   • Bug fixes \
   • Testing \
   • Add logs \
