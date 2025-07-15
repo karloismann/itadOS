@@ -111,14 +111,16 @@ getBootDisk() {
 
 initialize() {
 
+    mkdir lib/files/tmp
+    
     if [[ ! -d lib/files/tmp/logs/ ]]; then
-        mkdir lib/files/tmp/logs/
+        mkdir -p lib/files/tmp/logs/
     fi
 
     rm lib/files/tmp/verificationStatus/*
     rm lib/files/tmp/verifyFiles/*
     rm lib/files/tmp/progress/*
-    rm -r lib/files/tmp/chosenDisks/*
+    rm -rf lib/files/tmp/chosenDisks/*
     > lib/files/tmp/attachedDisks.txt
     > lib/files/tmp/attachedDisksFilter.txt
     > lib/files/tmp/chosenDisks.txt
