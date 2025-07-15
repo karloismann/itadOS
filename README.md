@@ -3,6 +3,9 @@
 It will permanently erase all data on connected storage devices and may cause irreversible changes. \
 This is a an early version and will contain bugs.**
 
+ISO DOWNLOAD: \
+https://drive.google.com/uc?export=download&id=1ygfTzOq2iRg-5R7ddh3NVmHQDC4EdTUa
+
 
 itadOS is a GDPR-aware data erasure tool that integrates existing Linux utilities into a functional, auditable, and user-friendly erasure system. \
 It allows the user to choose an erasure specification: \
