@@ -1,7 +1,7 @@
 # itadOS
 **WARNING: Use at your own risk. \
 It will permanently erase all data on storage devices and may cause irreversible changes or damage. \
-This is a an early version and may contain bugs.**
+This is an early version and may contain bugs.**
 
 itadOS is a GDPR-aware automated data erasure tool that integrates existing Linux utilities into a streamlined, auditable, and user-friendly erasure system. It is designed to be easy to use, even by less technical people, as technical decision making is automated.
 
