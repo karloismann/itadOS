@@ -5,7 +5,7 @@ This is a an early version and may contain bugs.**
 
 itadOS is a GDPR-aware automated data erasure tool that integrates existing Linux utilities into a streamlined, auditable, and user-friendly erasure system. It is designed to be easy to use, even by less technical people, as technical decision making is automated.
 
-It can be configured to your liking; boot and automatically start erasing all attached disks, set a specific erasure specification, etc. The various settings are explained in itadOS_config_explained.pdf and modifying the default behavious is explained in itadOS_guides.pdf.
+It can be configured to your liking; boot and automatically start erasing all attached disks, set a specific erasure specification, etc. The various settings are explained in itadOS_config_explained.pdf and modifying the default behaviour is explained in itadOS_guides.pdf.
 
 **Features:** \
   • Parallel multi-disk erasure. \
