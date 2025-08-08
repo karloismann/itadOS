@@ -1,17 +1,12 @@
 #!/bin/bash
 
 
-# Allows user to manually enter Service information, erasure specifications and other settings upon boot
-# options: on,off
-export MANUAL_USER_CONF="on"
-
-# Set Asset tag manually or automatically set asset tag as serial number
-# options: asset, serial
-export ASSET_CONF="asset"
+# Format
+###################################################################
 
 # itadOS information
 export ERASURE_NAME_CONF=""
-export ITADOS_VERSION_CONF="itadOSv.0.0.1"
+export ITADOS_VERSION_CONF="itadOS v.0.0.1"
 # "lib/files/stylesheet/logo/itadOS.png" for itadOS logo
 # "lib/files/stylesheet/logo/placeholder.png" for placeholder logo
 export ERASURE_LOGO_CONF="lib/files/stylesheet/logo/itadOS.png"
@@ -30,7 +25,6 @@ export TECHNICIAN_CONF=""
 export PROVIDER_CONF=""
 export LOCATION_CONF=""
 export CUSTOMER_CONF=""
-export PROVIDER_CONF=""
 export JOBNR_CONF=""
 
 
@@ -42,7 +36,7 @@ export JOBNR_CONF=""
 # Auto: If purge fails, falls back to clear.
 # Skip: skips erasure
 # options: purge, clear, auto, skip
-export ERASURE_SPEC_CONF="purge"
+export ERASURE_SPEC_CONF="auto"
 
 # Full: Scans entire disks for zero pattern [ CURRENTLY ONLY PURGE AND CLEAR SPEC VERIFICATION ]
 # Partial: Scans first and last 10% of disk for zero pattern
@@ -53,10 +47,18 @@ export VERIFICATION_CONF="full"
 # Other
 ####################################################################
 
+# Allows user to manually enter Service information, erasure specifications and other settings upon boot
+# options: on,off
+export MANUAL_USER_CONF="on"
+
 # Checks if disk has zero pattern after erasure, if not then fill with zero.
 # If 'off' then checks for zero pattern and adds a message if non zero spotted.
 # options: on, off
 export CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF="on"
+
+# Set Asset tag manually or automatically set asset tag as serial number
+# options: asset, serial
+export ASSET_CONF="asset"
 
 
 # If 'on' Does not show boot disk as erasable
