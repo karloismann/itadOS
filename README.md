@@ -20,7 +20,7 @@ It can be configured to your liking; boot and automatically start erasing all at
   • Reports in PDF and XML formats. \
   • UEFI and Legacy boot.
 
-**System Requirements:**
+**System Requirements:** \
 Currently supports only 64bit computers.
 2GB RAM
 
