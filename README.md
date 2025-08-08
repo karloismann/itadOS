@@ -21,7 +21,7 @@ It can be configured to your liking; boot and automatically start erasing all at
   • UEFI and Legacy boot.
 
 **System Requirements:** \
-Currently supports only 64bit computers.
+Currently supports only 64bit computers. \
 2GB RAM
 
 **Demonstration:** \
