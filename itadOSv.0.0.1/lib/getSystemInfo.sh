@@ -1,7 +1,7 @@
 #!/bin/bash
 
 getSerialNumber() {
-	SERIAL_NUMBER=$(dmidecode -t system | awk '/Serial Number:/ {print $3}')
+	SERIAL_NUMBER="$(dmidecode -t system | awk '/Serial Number:/ {print $3}' 2>/dev/null)"
 
 	if [[ "$SERIAL_NUMBER" == "" ]]; then
 		SERIAL_NUMBER=$(cat /proc/cpuinfo | awk -F ':' '/Serial/{print $2}')
@@ -16,7 +16,7 @@ getSerialNumber() {
 
 getModelVendor() {
 
-	SYSTEM_MANUFACTURER=$(dmidecode -s system-manufacturer)
+	SYSTEM_MANUFACTURER="$(dmidecode -s system-manufacturer 2>/dev/null)"
 
 	if [[ "$SYSTEM_MANUFACTURER" == "" ]]; then
 		SYSTEM_MANUFACTURER=$(cat /sys/class/dmi/id/sys_vendor)
@@ -32,7 +32,7 @@ getModelVendor() {
 
 getModelName() {
 
-	MODEL_NAME=$(dmidecode -s system-product-name)
+	MODEL_NAME="$(dmidecode -s system-product-name 2>/dev/null)"
 
 	if [[ "$MODEL_NAME" == "" ]]; then
 		MODEL_NAME=$(cat /proc/cpuinfo | awk -F ':' '/Model/{print $2}')
@@ -160,7 +160,7 @@ getBatteryHealth() {
 		
 		fi
 
-	elif [[ $(ls /sys/class/power_supply/*battery*) != "" ]]; then
+	elif [[ $(ls /sys/class/power_supply/*battery* 2>/dev/null) != "" ]]; then
 		BATTERY_HEALTH=$(cat /sys/class/power_supply/*battery*/health)
 
 		if [[ "$BATTERY_HEALTH" == "" ]]; then

@@ -7,7 +7,7 @@
 isDiskRemovable() {
     disk="$1"
     
-    removable=$(cat /sys/class/block/${disk}/removable)
+    removable=$(cat /sys/class/block/${disk}/removable 2>/dev/null)
 
     if [[ "$removable" == 0 ]]; then
         return 1
@@ -124,10 +124,10 @@ initialize() {
         BOOT_DISK_WARNING=""
     fi
 
-    rm lib/files/tmp/verificationStatus/*
-    rm lib/files/tmp/verifyFiles/*
-    rm lib/files/tmp/progress/*
-    rm -rf lib/files/tmp/chosenDisks/*
+    rm lib/files/tmp/verificationStatus/* 2>/dev/null
+    rm lib/files/tmp/verifyFiles/* 2>/dev/null
+    rm lib/files/tmp/progress/* 2>/dev/null
+    rm -rf lib/files/tmp/chosenDisks/* 2>/dev/null
     > lib/files/tmp/attachedDisks.txt
     > lib/files/tmp/attachedDisksFilter.txt
     > lib/files/tmp/chosenDisks.txt
