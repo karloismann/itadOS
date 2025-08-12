@@ -114,6 +114,7 @@ verifyErasure() {
             status "$dd_pid" &
             status_pid=$!
             wait "$dd_pid"
+            
             # If status updates are still active then kill
             kill "$status_pid" 2>/dev/null
             kill "$check_pid" 2>/dev/null
@@ -136,6 +137,46 @@ verifyErasure() {
             kill "$status_pid" 2>/dev/null
             kill "$check_pid" 2>/dev/null
             rm "$TMP_FIFO"
+        ;;
+        sampling)
+            
+            MiB=1048576
+			local sizeInBytes="$(getDiskSizeInBytes "$disk")"
+			local sections="$(( $RANDOM % ( 1500 - 1000 + 1 ) + 1000 ))"
+			local sectionSize="$(( (sizeInBytes / sections) / $MiB ))"
+			local percentage="$(( $RANDOM % ( 20 - 10 + 1 ) + 10 ))"
+			local count="$(( (sectionSize * $percentage) / 100 ))"
+			if (( $count == 0 )); then
+				count=1
+			fi
+			local sectionSizeMinusCount="$(( $sectionSize - $count ))"
+			local areaProcessed=0
+			
+			TMP_FIFO=$(mktemp -u)
+			mkfifo "$TMP_FIFO"
+			
+			checkBits &
+            check_pid=$!
+			
+			for (( i=0; i<$sections; i++ )); do
+				skip="$(( $RANDOM % (sectionSizeMinusCount - 0 + 1) + 0 ))"
+				skip="$(( $areaProcessed + $skip ))"
+				dd if=/dev/$disk bs=1M skip="$skip" count="$count" status=progress > "$TMP_FIFO" 2> "$VERIFICATION_STATUS" & 
+				dd_pid=$!
+				
+				status "$dd_pid" &
+				status_pid=$!
+				wait "$dd_pid"
+				areaProcessed="$(( areaProcessed + sectionSize ))"
+					
+			done
+
+				
+			# If status updates are still active then kill
+			kill "$status_pid" 2>/dev/null
+			kill "$check_pid" 2>/dev/null
+			rm "$TMP_FIFO"
+           
         ;;
         skip)
 
