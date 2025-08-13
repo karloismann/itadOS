@@ -180,6 +180,7 @@ verification_spec() {
         VERIFICATION_CONF=$(whiptail --radiolist "Choose verification specification." 0 0 0 \
             "full" "Scans entire disks for zero pattern." OFF \
             "partial" "Scans first and last 10% of disk for zero pattern." OFF \
+            "sampling" "Scans 10%-20% random sections for zero pattern." OFF \
             "skip" "Skips verification." OFF 3>&1 1>&2 2>&3)
         local exit_status=$?
 

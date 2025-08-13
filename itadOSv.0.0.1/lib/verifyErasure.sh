@@ -17,6 +17,7 @@
 #
 verifyErasure() {
     disk="$1"
+    fail="false"
 
     #default 64M
     # This needs to be 1M for partial verification to function correctly
@@ -47,7 +48,7 @@ verifyErasure() {
         while kill -0 "$pid" 2>/dev/null; do
             currentProgress=$(tr -d '\000' < "$VERIFICATION_STATUS" | awk 'END {print}')
             echo "$currentProgress" > "$TMP_PROGRESS"
-            sleep 2
+            sleep 0.1
         done
     }
 
@@ -141,34 +142,44 @@ verifyErasure() {
         sampling)
             
             MiB=1048576
-			local sizeInBytes="$(getDiskSizeInBytes "$disk")"
-			local sections="$(( $RANDOM % ( 1500 - 1000 + 1 ) + 1000 ))"
-			local sectionSize="$(( (sizeInBytes / sections) / $MiB ))"
-			local percentage="$(( $RANDOM % ( 20 - 10 + 1 ) + 10 ))"
-			local count="$(( (sectionSize * $percentage) / 100 ))"
-			if (( $count == 0 )); then
+			sizeInBytes="$(getDiskSizeInBytes "$disk")"
+			sections="$(( $RANDOM % ( 1500 - 1000 + 1 ) + 1000 ))"
+			sectionSize="$(( (sizeInBytes / sections) / $MiB ))"
+			percentage="$(( $RANDOM % ( 20 - 10 + 1 ) + 10 ))"
+			count="$(( (sectionSize * $percentage) / 100 ))"
+			if [[ $count -eq 0 ]]; then
 				count=1
 			fi
-			local sectionSizeMinusCount="$(( $sectionSize - $count ))"
-			local areaProcessed=0
+			sectionSizeMinusCount="$(( $sectionSize - $count ))"
+			areaProcessed=0
 			
-			TMP_FIFO=$(mktemp -u)
+            TMP_FIFO=$(mktemp -u)
 			mkfifo "$TMP_FIFO"
-			
-			checkBits &
-            check_pid=$!
-			
+
 			for (( i=0; i<$sections; i++ )); do
-				skip="$(( $RANDOM % (sectionSizeMinusCount - 0 + 1) + 0 ))"
+				skip="$(( $RANDOM % ($sectionSizeMinusCount - 0 + 1) + 0 ))"
 				skip="$(( $areaProcessed + $skip ))"
-				dd if=/dev/$disk bs=1M skip="$skip" count="$count" status=progress > "$TMP_FIFO" 2> "$VERIFICATION_STATUS" & 
-				dd_pid=$!
+
+                progress="$(( $i * 100 / $sections ))"
+                echo "Verification progress: ${progress}%" > "$TMP_PROGRESS"
+
+                checkBits &
+                check_pid=$!
 				
-				status "$dd_pid" &
-				status_pid=$!
+                dd if=/dev/$disk bs=1M skip="$skip" count="$count" status=progress > "$TMP_FIFO" 2> /dev/null & 
+				dd_pid=$!
+
 				wait "$dd_pid"
-				areaProcessed="$(( areaProcessed + sectionSize ))"
-					
+
+                if [[ -s "$TMP_NON_ZERO_BITS" ]]; then
+                    break
+                fi
+
+                
+				areaProcessed="$(( $areaProcessed + $sectionSize ))"
+
+                #log "disk size=${sizeInBytes} sections=${sections} section size=${sectionSize} skip=${skip} count=${count} processed:${areaProcessed} progress:${progress}"
+				
 			done
 
 				
@@ -282,6 +293,9 @@ verifyErasure() {
         elif [[ "$scan" == "partial" ]]; then
             ERASURE_VERIFICATION="SUCCESS [partial]"
             result="Verification of ${disk} $(cat ${DISK_FILES}${disk}/serial.txt) $(cat ${DISK_FILES}${disk}/model.txt): $ERASURE_VERIFICATION"
+        elif [[ "$scan" == "sampling" ]]; then
+            ERASURE_VERIFICATION="SUCCESS [sampling]"
+            result="Verification of ${disk} $(cat ${DISK_FILES}${disk}/serial.txt) $(cat ${DISK_FILES}${disk}/model.txt): $ERASURE_VERIFICATION"
         elif [[ "$scan" == "quick_check" ]]; then
             return 6
         else
@@ -308,6 +322,9 @@ verifyErasure() {
             result="Verification of ${disk} $(cat ${DISK_FILES}${disk}/serial.txt) $(cat ${DISK_FILES}${disk}/model.txt): $ERASURE_VERIFICATION"
         elif [[ "$scan" == "partial" ]]; then
             ERASURE_VERIFICATION="FAIL [partial]"
+            result="Verification of ${disk} $(cat ${DISK_FILES}${disk}/serial.txt) $(cat ${DISK_FILES}${disk}/model.txt): $ERASURE_VERIFICATION"
+        elif [[ "$scan" == "sampling" ]]; then
+            ERASURE_VERIFICATION="FAIL [sampling]"
             result="Verification of ${disk} $(cat ${DISK_FILES}${disk}/serial.txt) $(cat ${DISK_FILES}${disk}/model.txt): $ERASURE_VERIFICATION"
         elif [[ "$scan" == "quick_check" ]]; then
             return 7
