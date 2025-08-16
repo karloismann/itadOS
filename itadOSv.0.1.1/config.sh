@@ -6,7 +6,7 @@
 
 # itadOS information
 export ERASURE_NAME_CONF=""
-export ITADOS_VERSION_CONF="itadOS v.0.0.1"
+export ITADOS_VERSION_CONF="itadOS v.0.1.1"
 # "lib/files/stylesheet/logo/itadOS.png" for itadOS logo
 # "lib/files/stylesheet/logo/placeholder.png" for placeholder logo
 export ERASURE_LOGO_CONF="lib/files/stylesheet/logo/itadOS.png"
