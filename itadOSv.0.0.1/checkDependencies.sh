@@ -83,3 +83,5 @@ checkDependencies() {
 
   done
 }
+
+checkDependencies

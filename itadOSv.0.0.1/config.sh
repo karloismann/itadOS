@@ -36,7 +36,7 @@ export JOBNR_CONF=""
 # Auto: If purge fails, falls back to clear.
 # Skip: skips erasure
 # options: purge, clear, auto, skip
-export ERASURE_SPEC_CONF="skip"
+export ERASURE_SPEC_CONF="auto"
 
 # Full: Scans entire disks for zero pattern [ CURRENTLY ONLY PURGE AND CLEAR SPEC VERIFICATION ]
 # Partial: Scans first and last 10% of disk for zero pattern
@@ -63,7 +63,7 @@ export ASSET_CONF="asset"
 
 # If 'on' Does not show boot disk as erasable
 # options: on, off
-export FILTER_BOOT_DISK_CONF="off"
+export FILTER_BOOT_DISK_CONF="on"
 
 
 # SMART health check variants

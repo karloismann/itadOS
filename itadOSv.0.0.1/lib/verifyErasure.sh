@@ -6,7 +6,7 @@
 # If non 0 bit is found then verification fails.
 # @Param $1 disk to verify
 # @Param $2 Block size for dd
-# @Param $3 verification type (full, partial, skip snapshot_before, snapshot_after, compare_snapshots)
+# @Param $3 verification type (full, partial, sampling, skip snapshot_before, snapshot_after, compare_snapshots)
 # @Returns 0 if verification success
 # @Returns 1 if verification failed
 # @Returns 2 if verification skipped
@@ -17,7 +17,8 @@
 #
 verifyErasure() {
     disk="$1"
-    fail="false"
+    MiB=1048576
+    KiB=1024
 
     #default 64M
     # This needs to be 1M for partial verification to function correctly
@@ -97,7 +98,7 @@ verifyErasure() {
 
             sizeInBytes=$(getDiskSizeInBytes "$disk")
             # Convert size to MB
-            sizeInBytes=$(( "$sizeInBytes" / 1048576 ))
+            sizeInBytes=$(( "$sizeInBytes" / "$MiB" ))
 
             firstBlock=$(( sizeInBytes / 10 ))
             lastBlocks=$(( sizeInBytes - firstBlock ))
@@ -140,36 +141,80 @@ verifyErasure() {
             rm "$TMP_FIFO"
         ;;
         sampling)
-            
-            MiB=1048576
+
 			sizeInBytes="$(getDiskSizeInBytes "$disk")"
-			sections="$(( $RANDOM % ( 1500 - 1000 + 1 ) + 1000 ))"
-			sectionSize="$(( (sizeInBytes / sections) / $MiB ))"
-			percentage="$(( $RANDOM % ( 20 - 10 + 1 ) + 10 ))"
-			count="$(( (sectionSize * $percentage) / 100 ))"
-			if [[ $count -eq 0 ]]; then
+
+            # If size is reported incorrectly, error.
+            if [[ "$sizeInBytes" == "0" ]]; then
+                echo "Error occurred" > "$TMP_NON_ZERO_BITS"
+                log "${disk} sampling verification error occurred."
+            fi
+			sections="$(( ($RANDOM % ( 1500 - 1000 + 1 ) + 1000) ))"
+			sectionSize="$(( ($sizeInBytes / $sections) / $KiB ))"
+            percentage="$(( ($RANDOM % ( 20 - 10 + 1 ) + 10) ))"
+			count="$(( ((($sectionSize * $percentage) / 100) / 2) ))"
+            sectionHalf="$(( $sectionSize / 2 ))"
+			if [[ "$count" -eq 0 ]]; then
 				count=1
 			fi
-			sectionSizeMinusCount="$(( $sectionSize - $count ))"
+			#sectionSizeMinusCount="$(( $sectionSize - $count ))"
+            sectionHalfMinusCount="$(( $sectionHalf - $count ))"
+
+            # If half minus scannable size is less than 0 then reset to 0
+            if [[ "$sectionHalfMinusCount" -le 0 ]]; then
+                sectionHalfMinusCount=0
+            fi
+
 			areaProcessed=0
 			
             TMP_FIFO=$(mktemp -u)
 			mkfifo "$TMP_FIFO"
 
 			for (( i=0; i<$sections; i++ )); do
-				skip="$(( $RANDOM % ($sectionSizeMinusCount - 0 + 1) + 0 ))"
-				skip="$(( $areaProcessed + $skip ))"
-
+                
+                # Progression 
                 progress="$(( $i * 100 / $sections ))"
                 echo "Verification progress: ${progress}%" > "$TMP_PROGRESS"
 
+                # First part of section
                 checkBits &
                 check_pid=$!
+
+                # Random spot within a first half of a section
+                skip="$(( ($RANDOM % ($sectionHalfMinusCount - 0 + 1) + 0 ) ))"  
+                log "${disk} First half: ${skip}"
+                if [[ "$skip" -le 0 ]]; then
+                    skip=0
+                fi
+                skip="$(( $areaProcessed + $skip ))"
 				
-                dd if=/dev/$disk bs=1M skip="$skip" count="$count" status=progress > "$TMP_FIFO" 2> /dev/null & 
+                dd if=/dev/$disk bs=1K skip="$skip" count="$count" status=progress > "$TMP_FIFO" 2> /dev/null & 
 				dd_pid=$!
 
 				wait "$dd_pid"
+                if kill -0 "$check_pid" 2>/dev/null; then
+                    kill "$check_pid" 2>/dev/null
+                fi
+
+                # Second part of section
+                checkBits &
+                check_pid=$!
+
+                # Random spot within a second half of a section
+                skip="$(( ($RANDOM % ($sectionHalfMinusCount - 0 + 1) + $sectionHalfMinusCount ) ))"
+                if [[ "$skip" -eq "$sectionHalfMinusCount" ]]; then
+                    skip="$sectionHalf"
+                fi
+                log "${disk} Second half: ${skip}"
+				skip="$(( $areaProcessed + $skip ))"
+				
+                dd if=/dev/$disk bs=1K skip="$skip" count="$count" status=progress > "$TMP_FIFO" 2> /dev/null & 
+				dd_pid=$!
+
+				wait "$dd_pid"
+                if kill -0 "$check_pid" 2>/dev/null; then
+                    kill "$check_pid" 2>/dev/null
+                fi
 
                 if [[ -s "$TMP_NON_ZERO_BITS" ]]; then
                     break
@@ -178,7 +223,7 @@ verifyErasure() {
                 
 				areaProcessed="$(( $areaProcessed + $sectionSize ))"
 
-                #log "disk size=${sizeInBytes} sections=${sections} section size=${sectionSize} skip=${skip} count=${count} processed:${areaProcessed} progress:${progress}"
+                log "disk size=${sizeInBytes} sections=${sections} section size=${sectionSize} skip=${skip} count=${count} processed:${areaProcessed} progress:${progress}"
 				
 			done
 

@@ -39,7 +39,7 @@ while [[ "$RUNNING" == "true" ]]; do
 
     initialize
     GetSystemInfo
-    checkDependencies
+#    checkDependencies
 
 
     if [[ "$MANUAL_USER_CONF" == "on" ]]; then
