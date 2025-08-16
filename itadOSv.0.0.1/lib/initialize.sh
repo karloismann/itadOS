@@ -42,17 +42,9 @@ partitionLabel() {
 # Find itadOS file (Currently commented out). Old method should be enough
 findItadOS() {
 
-    BOOT_DISK=$(lsblk -no pkname | xargs | awk '{print $1}' )
+    BOOT_DISK="$(findmnt / | awk -F'/' '/dev/{print $4}' | awk '{print $1}' )"
+    BOOT_DISK="${BOOT_DISK::-1}"
 
-    # Find itadOS folder
-    #FIND="lib/files/tmp/findItadOS.txt"
-    #> "$FIND"
-
-    #find / -type d -iname "itados28-04" > "$FIND"
-    #found=$(awk 'END{print}' "$FIND")
-
-    #BOOT_DISK=$(df "$found" | awk 'NR==2 {print $1}' )
-    #BOOT_DISK=$(lsblk -no pkname "$BOOT_DISK" | xargs | awk '{print $1}')
 }
 
 

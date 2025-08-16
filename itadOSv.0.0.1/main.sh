@@ -8,7 +8,6 @@ erasureVerificatioDone=""
 
 source lib/initialize.sh
 source lib/userConfig.sh
-source lib/checkDependencies.sh # Create documentation
 source ./config.sh
 source lib/interaction.sh
 source lib/reportToUSB.sh
@@ -39,8 +38,6 @@ while [[ "$RUNNING" == "true" ]]; do
 
     initialize
     GetSystemInfo
-#    checkDependencies
-
 
     if [[ "$MANUAL_USER_CONF" == "on" ]]; then
         menu
