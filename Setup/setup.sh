@@ -600,8 +600,8 @@ setupMenu() {
                                 createEnviroment
                         fi
 
-                        #createConfig
-                        #build
+                        createConfig
+                        build
                 ;;
                 Modify_settings)
                         if checkEnviroment; then
@@ -612,9 +612,6 @@ setupMenu() {
 
                         checkDependencies
                         createEnviroment
-
-
-
                 ;;
         esac
 
