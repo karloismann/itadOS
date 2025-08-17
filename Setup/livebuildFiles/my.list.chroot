@@ -1,0 +1,8 @@
+nvme-cli
+lshw
+hdparm
+mmc-utils
+fop
+xsltproc
+smartmontools
+pciutils
