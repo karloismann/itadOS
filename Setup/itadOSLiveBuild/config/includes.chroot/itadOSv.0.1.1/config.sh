@@ -5,7 +5,7 @@
 ###################################################################
 
 # itadOS information
-export ERASURE_NAME_CONF=""
+export ERASURE_NAME_CONF="Test"
 export ITADOS_VERSION_CONF="itadOS v.0.1.1"
 # "lib/files/stylesheet/logo/itadOS.png" for itadOS logo
 # "lib/files/stylesheet/logo/placeholder.png" for placeholder logo
@@ -21,11 +21,11 @@ export SYSTEM_SPEC_CONF="min"
 
 # Service Information
 ###################################################################
-export TECHNICIAN_CONF=""
-export PROVIDER_CONF="me still"
-export LOCATION_CONF="this is a long ass address"
-export CUSTOMER_CONF="some nice ass"
-export JOBNR_CONF="69696969"
+export TECHNICIAN_CONF="lalalaland"
+export PROVIDER_CONF="123"
+export LOCATION_CONF="123123"
+export CUSTOMER_CONF="123213213"
+export JOBNR_CONF="34324324"
 
 
 # Erasure specification
@@ -36,7 +36,7 @@ export JOBNR_CONF="69696969"
 # Auto: If purge fails, falls back to clear.
 # Skip: skips erasure
 # options: purge, clear, auto, skip
-export ERASURE_SPEC_CONF="auto"
+export ERASURE_SPEC_CONF="skip"
 
 # Full: Scans entire disks for zero pattern [ CURRENTLY ONLY PURGE AND CLEAR SPEC VERIFICATION ]
 # Partial: Scans first and last 10% of disk for zero pattern

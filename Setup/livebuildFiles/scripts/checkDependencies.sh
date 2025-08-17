@@ -2,7 +2,7 @@
 
 # List of dependencies
 packages=("whiptail" "nvme-cli" "lshw" "coreutils" "util-linux" "mmc-utils" "smartmontools" "pciutils" "fop" "xsltproc" "live-build" "isolinux")
-
+installed="true"
 
 # Checks if package is installed 
 # @param $1: package to check 
@@ -59,6 +59,7 @@ checkDependencies() {
 			;;
 			n)
 			  echo "${pkg} installation skipped. ItadOS will not function as intended."
+			  installed="false"
 			;;
 		  esac
 	  
@@ -74,6 +75,7 @@ checkDependencies() {
 			;;
 			1)
 			  whiptail --msgbox "${pkg} installation skipped. ItadOS will not function as intended." 0 0
+			  installed="false"
 			;;
 		  esac
 		  
@@ -82,6 +84,11 @@ checkDependencies() {
     fi
 
   done
-}
 
-checkDependencies
+	if [[ "$installed" == "false" ]]; then
+		installed="true"
+		return 1
+	else
+		return 0
+	fi
+}

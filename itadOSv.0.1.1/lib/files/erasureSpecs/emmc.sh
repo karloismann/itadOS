@@ -17,8 +17,8 @@ emmc_clear() {
     local mmcSecure_erase_exit_code
 
     # Get mmc-utils tool information
-    local tool=$(apt show mmc-utils | awk '/Package:/ {print $2}')
-	local version=$(apt show mmc-utils | awk '/Version:/ {print $2}')
+    local tool=$(apt-cache show mmc-utils | awk '/Package:/ {print $2}')
+	local version=$(apt-cache show mmc-utils | awk '/Version:/ {print $2}')
     local mmcTool="${tool} ${version}"
     local toolMessage="$mmcTool"
 
