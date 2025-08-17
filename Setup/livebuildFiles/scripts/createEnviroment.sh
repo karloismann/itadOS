@@ -1,18 +1,18 @@
 #!/bin/bash
-
+source ../livebuildFiles/scripts/config.sh
 itadOS="itadOSv.0.1.1"
-config="./itadOSLiveBuild/config"
-myListChroot="./livebuildFiles/my.list.chroot"
-bashrc="./livebuildFiles/.bashrc"
-logind="./livebuildFiles/logind.conf"
-isolinux="./livebuildFiles/isolinux.cfg"
-grub="./livebuildFiles/grub.cfg"
+config="./config"
+myListChroot="../livebuildFiles/my.list.chroot"
+bashrc="../livebuildFiles/.bashrc"
+logind="../livebuildFiles/logind.conf"
+isolinux="../livebuildFiles/isolinux.cfg"
+grub="../livebuildFiles/grub.cfg"
 
 createEnviroment() {
 
     while true; do
         # Create directory for itadOS
-        mkdir ./itadOSLiveBuild
+        mkdir ./itadOSLiveBuild && cd ./itadOSLiveBuild
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -21,7 +21,7 @@ createEnviroment() {
         fi
 
         # create config
-        ./config.sh
+        createConfig
 
         # Move itadOS into live-build
         mkdir -p "${config}"/includes.chroot && mv ./"${itadOS}" "${config}"/includes.chroot
