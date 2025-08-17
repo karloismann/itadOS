@@ -1,18 +1,21 @@
 #!/bin/bash
-source ../livebuildFiles/scripts/config.sh
-itadOS="itadOSv.0.1.1"
-config="./config"
-myListChroot="../livebuildFiles/my.list.chroot"
-bashrc="../livebuildFiles/.bashrc"
-logind="../livebuildFiles/logind.conf"
-isolinux="../livebuildFiles/isolinux.cfg"
-grub="../livebuildFiles/grub.cfg"
+
+script_dir=$(realpath "$(dirname "$0")")
+itadOS="${script_dir}/../itadOSv.0.1.1"
+
+myListChroot="${script_dir}/livebuildFiles/confFiles/my.list.chroot"
+bashrc="${script_dir}/livebuildFiles/confFiles/.bashrc"
+logind="${script_dir}/livebuildFiles/confFiles/logind.conf"
+isolinux="${script_dir}/livebuildFiles/confFiles/isolinux.cfg"
+grub="${script_dir}/livebuildFiles/confFiles/grub.cfg"
 
 createEnviroment() {
 
+    cd "$script_dir"
+
     while true; do
         # Create directory for itadOS
-        mkdir ./itadOSLiveBuild && cd ./itadOSLiveBuild
+        mkdir ./itadOSLiveBuild
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -20,11 +23,18 @@ createEnviroment() {
             return 1
         fi
 
+        cd "${script_dir}"/itadOSLiveBuild
+
         # create config
-        createConfig
+        source "${script_dir}"/livebuildFiles/scripts/config.sh
+        createConfig &
+        configPID=$!
+        wait "$configPID"
+
+        config="${script_dir}/itadOSLiveBuild/config"
 
         # Move itadOS into live-build
-        mkdir -p "${config}"/includes.chroot && mv ./"${itadOS}" "${config}"/includes.chroot
+        mkdir -p "${config}"/includes.chroot && cp -r "${itadOS}" "${config}"/includes.chroot
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -42,7 +52,7 @@ createEnviroment() {
         fi
 
         # Move dependency list to live-build
-        mv "${myListChroot}" "${config}"/package-lists/
+        mkdir -p "${config}"/package-lists && cp "${myListChroot}" "${config}"/package-lists/
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -51,7 +61,7 @@ createEnviroment() {
         fi
 
         # Move .bashrc to live-build
-        mkdir -p "${config}"/root && mv "${bashrc}" "${config}"/root
+        mkdir -p "${config}"/root && cp "${bashrc}" "${config}"/root/
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -60,7 +70,7 @@ createEnviroment() {
         fi
 
         # Move logind to live-build
-        mkdir -p "${config}"/includes.chroot/etc/systemd && mv "${logind}" "${config}"/includes.chroot/etc/systemd
+        mkdir -p "${config}"/includes.chroot/etc/systemd && cp "${logind}" "${config}"/includes.chroot/etc/systemd
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -69,7 +79,7 @@ createEnviroment() {
         fi
 
         # Move ioslinux to live-build
-        mkdir -p "${config}"/includes.binary/isolinux && mv "${isolinux}" "${config}"/includes.binary/isolinux
+        mkdir -p "${config}"/includes.binary/isolinux && cp "${isolinux}" "${config}"/includes.binary/isolinux
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
@@ -87,7 +97,7 @@ createEnviroment() {
         fi
 
         # Move grub to live-build
-        mkdir -p "${config}"/includes.binary/boot/grub && mv "${grub}" "${config}"/includes.binary/boot/grub
+        mkdir -p "${config}"/includes.binary/boot/grub && cp "${grub}" "${config}"/includes.binary/boot/grub
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then

@@ -594,6 +594,8 @@ setupMenu() {
                         fi
                 ;;
                 Generate_ISO)
+                        checkDependencies
+
                         if checkEnviroment; then
                                 clean
                         else
@@ -602,16 +604,26 @@ setupMenu() {
 
                         createConfig
                         build
+                        exitcode=$?
+
+                        if [[ "$exitcode" -ne 0 ]]; then
+                                whiptail --msgbox "Error occurred." 0 0
+                        else
+                                whiptail --msgbox "itadOS ISO generated." 0 0
+                        fi
                 ;;
                 Modify_settings)
                         if checkEnviroment; then
                                 configMenu
-                        else
-                                continue
+                                return 0
                         fi
 
-                        checkDependencies
-                        createEnviroment
+                        if checkDependencies; then
+                                createEnviroment
+                        else
+                                whiptail --msgbox "Dependencies missing." 0 0
+                                return 0
+                        fi
                 ;;
         esac
 
