@@ -1,6 +1,9 @@
 #!/bin/bash
 
 createConfig() {
+    target="$1"
+    cd "$target"
+    
     lb config \
     --distribution bookworm \
     --iso-volume "ITADOS" \

@@ -2,6 +2,7 @@
 
 script_dir=$(realpath "$(dirname "$0")")
 itadOS="${script_dir}/../itadOSv.0.1.1"
+itadOSLiveBuild="${script_dir}/itadOSLiveBuild"
 
 myListChroot="${script_dir}/livebuildFiles/confFiles/my.list.chroot"
 bashrc="${script_dir}/livebuildFiles/confFiles/.bashrc"
@@ -27,7 +28,7 @@ createEnviroment() {
 
         # create config
         source "${script_dir}"/livebuildFiles/scripts/config.sh
-        createConfig &
+        createConfig "itadOSLiveBuild" &
         configPID=$!
         wait "$configPID"
 
@@ -61,7 +62,7 @@ createEnviroment() {
         fi
 
         # Move .bashrc to live-build
-        mkdir -p "${config}"/root && cp "${bashrc}" "${config}"/root/
+        mkdir -p "${config}"/includes.chroot/root && cp "${bashrc}" "${config}"/includes.chroot/root/
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then

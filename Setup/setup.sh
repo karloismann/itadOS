@@ -1,10 +1,12 @@
 #!/bin/bash
+script_dir=$(realpath "$(dirname "$0")")
 
-source ./livebuildFiles/scripts/config.sh
-source ./livebuildFiles/scripts/checkDependencies.sh
-source ./livebuildFiles/scripts/createEnviroment.sh
+source "${script_dir}"/livebuildFiles/scripts/config.sh
+source "${script_dir}"/livebuildFiles/scripts/checkDependencies.sh
+source "${script_dir}"/livebuildFiles/scripts/createEnviroment.sh
 
-config="./itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/config.sh"
+itadOSLiveBuild="${script_dir}/itadOSLiveBuild"
+config="${script_dir}/itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/config.sh"
 
 ######################## FORMAT #########################################
 
@@ -563,13 +565,19 @@ checkEnviroment() {
 
 clean() {
 
-        lb clean --purge
+        cd "$itadOSLiveBuild"
+        lb clean --purge &
+        cleanPID=$!
+        wait "$cleanPID"
 
 }
 
 build() {
-
+        
+        cd "$itadOSLiveBuild"
         lb build
+        buildPID=$!
+        wait "$buildPID"
 
 }
 
@@ -598,11 +606,16 @@ setupMenu() {
 
                         if checkEnviroment; then
                                 clean
+
+                                createConfig &
+                                createConfigPID=$!
+                                wait "$createConfigPID"
                         else
-                                createEnviroment
+                                createEnviroment &
+                                createEnvPID=$!
+                                wait "$createEnvPID"
                         fi
 
-                        createConfig
                         build
                         exitcode=$?
 
@@ -612,18 +625,23 @@ setupMenu() {
                                 whiptail --msgbox "itadOS ISO generated." 0 0
                         fi
                 ;;
-                Modify_settings)
-                        if checkEnviroment; then
-                                configMenu
-                                return 0
-                        fi
+                Modify_settings)   
+                        while true; do             
+                                if checkEnviroment; then
+                                        configMenu
+                                        return 0
+                                fi
 
-                        if checkDependencies; then
-                                createEnviroment
-                        else
-                                whiptail --msgbox "Dependencies missing." 0 0
-                                return 0
-                        fi
+                                if checkDependencies; then
+                                        createEnviroment &
+                                        createEnvPID=$!
+                                        wait "$createEnvPID"
+                                        
+                                else
+                                        whiptail --msgbox "Error: Dependencies not installed." 0 0
+                                        return 0
+                                fi
+                        done
                 ;;
         esac
 
