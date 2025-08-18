@@ -38,7 +38,8 @@ export JOBNR_CONF=""
 # options: purge, clear, auto, skip
 export ERASURE_SPEC_CONF="auto"
 
-# Full: Scans entire disks for zero pattern [ CURRENTLY ONLY PURGE AND CLEAR SPEC VERIFICATION ]
+# Full: Scans entire disks for zero pattern [ NIST ]
+# Sampling: Splits disk into 1000-1500 sections. Splits each section in half and scans 5-10% of each half. [ NIST ]
 # Partial: Scans first and last 10% of disk for zero pattern
 # Skip: Skips verification.
 # options: full, partial, sampling, skip 

@@ -42,10 +42,26 @@ set_ITADOS_VERSION_CONF() {
 
 set_ERASURE_LOGO_CONF() {
 
-        ERASURE_LOGO_CONF=$(whiptail --cancel-button "Back" --inputbox "Set logo location." 0 0 3>&1 1>&2 2>&3)
+        logos="${script_dir}/itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/lib/files/stylesheet/logo"
+        erasure_logo_conf_logos="lib/files/stylesheet/logo/"
+        
+        # Prepare options for whiptail
+        options=()
+        for file in "$logos"/*; do
+                fname=$(basename "$file")
+                options+=("$fname" "" OFF)
+        done
+
+        # Display whiptail with dynamically updated options.
+        choice=$(whiptail --cancel-button "Back" --title "Choose logo" --radiolist \
+            "Choose USB drive (Press 'OK' to refresh list):" 0 0 0 \
+            "${options[@]}" 3>&1 1>&2 2>&3)
+        exit_status=$?
+
+        ERASURE_LOGO_CONF="erasure_logo_conf_logos/${$choice}"
         exitcode=$?
 
-        if [[ "$exitcode" -eq 0 ]]; then
+        if [[ "$exitcode" -eq 0 ]] && [[ "$choice" != "" ]]; then
                 sed -i "s|ERASURE_LOGO_CONF=".*"|ERASURE_LOGO_CONF=\"$ERASURE_LOGO_CONF\"|" "${config}"
                 whiptail --msgbox "ERASURE_LOGO_CONF set to: ${ERASURE_LOGO_CONF}" 0 0
                 formatMenu
@@ -607,7 +623,7 @@ setupMenu() {
                         if checkEnviroment; then
                                 clean
 
-                                createConfig &
+                                createConfig "$itadOSLiveBuild" &
                                 createConfigPID=$!
                                 wait "$createConfigPID"
                         else
