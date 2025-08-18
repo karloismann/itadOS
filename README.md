@@ -10,7 +10,7 @@ It can be configured to your liking; boot and automatically start erasing all at
 **Features:** \
   • Parallel multi-disk erasure. \
   • Automatic disk type detection and applies appropriate erasure methods accordingly. \
-  • Erasure verification [full, partial, skip]. \
+  • Erasure verification [full, partial, sampling, skip]. \
   • SMART health test. \
   • Asynchronous erasure, verification and health test. \
   • DCO and HPA detection/removal. \
@@ -26,9 +26,6 @@ Currently supports only 64bit computers. \
 
 **Demonstration:** \
 [(https://www.youtube.com/watch?v=2JKHfybVZeY&ab_channel=itadOS)](https://www.youtube.com/watch?v=2JKHfybVZeY&ab_channel=itadOS)
-
-**ISO DOWNLOAD:** \
-https://drive.google.com/uc?export=download&id=1sH1MbTlfzkQweXfaXBdihO05Gc6DGrdT
 
 **Report bugs and send feedback:** \
 itadoperatingsystem@gmail.com
