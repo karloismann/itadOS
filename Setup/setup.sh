@@ -43,22 +43,22 @@ set_ITADOS_VERSION_CONF() {
 set_ERASURE_LOGO_CONF() {
 
         logos="${script_dir}/itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/lib/files/stylesheet/logo"
-        erasure_logo_conf_logos="lib/files/stylesheet/logo/"
+        erasure_logo_conf_logos="lib/files/stylesheet/logo"
         
         # Prepare options for whiptail
         options=()
         for file in "$logos"/*; do
-                fname=$(basename "$file")
-                options+=("$fname" "" OFF)
+                logo=$(basename "$file")
+                options+=("$logo" "" OFF)
         done
 
-        # Display whiptail with dynamically updated options.
+        # Display whiptail with all detected logos.
         choice=$(whiptail --cancel-button "Back" --title "Choose logo" --radiolist \
-            "Choose USB drive (Press 'OK' to refresh list):" 0 0 0 \
+            "Choose logo to be shown on report:" 0 0 0 \
             "${options[@]}" 3>&1 1>&2 2>&3)
         exit_status=$?
 
-        ERASURE_LOGO_CONF="erasure_logo_conf_logos/${$choice}"
+        ERASURE_LOGO_CONF="${erasure_logo_conf_logos}/${choice}"
         exitcode=$?
 
         if [[ "$exitcode" -eq 0 ]] && [[ "$choice" != "" ]]; then
