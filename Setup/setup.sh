@@ -17,8 +17,14 @@ set_ERASURE_NAME_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|ERASURE_NAME_CONF=".*"|ERASURE_NAME_CONF=\"$ERASURE_NAME_CONF\"|" "${config}"
-                whiptail --msgbox "ERASURE_NAME_CONF set to: ${ERASURE_NAME_CONF}" 0 0
-                formatMenu
+                sedExitcode=$?
+
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "ERASURE_NAME_CONF set to: ${ERASURE_NAME_CONF}" 0 0
+                        formatMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 formatMenu
         fi
@@ -32,8 +38,14 @@ set_ITADOS_VERSION_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|ITADOS_VERSION_CONF=".*"|ITADOS_VERSION_CONF=\"$ITADOS_VERSION_CONF\"|" "${config}"
-                whiptail --msgbox "ITADOS_VERSION_CONF set to: ${ITADOS_VERSION_CONF}" 0 0
-                formatMenu
+                sedExitcode=$?
+
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "ITADOS_VERSION_CONF set to: ${ITADOS_VERSION_CONF}" 0 0
+                        formatMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 formatMenu
         fi
@@ -63,8 +75,14 @@ set_ERASURE_LOGO_CONF() {
 
         if [[ "$exitcode" -eq 0 ]] && [[ "$choice" != "" ]]; then
                 sed -i "s|ERASURE_LOGO_CONF=".*"|ERASURE_LOGO_CONF=\"$ERASURE_LOGO_CONF\"|" "${config}"
-                whiptail --msgbox "ERASURE_LOGO_CONF set to: ${ERASURE_LOGO_CONF}" 0 0
-                formatMenu
+                sedExitcode=$?
+
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "ERASURE_LOGO_CONF set to: ${ERASURE_LOGO_CONF}" 0 0
+                        formatMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 formatMenu
         fi
@@ -88,8 +106,14 @@ set_SYSTEM_SPEC_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|SYSTEM_SPEC_CONF=".*"|SYSTEM_SPEC_CONF=\"$SYSTEM_SPEC_CONF\"|" "${config}"
-                whiptail --msgbox "SYSTEM_SPEC_CONF set to: ${SYSTEM_SPEC_CONF}" 0 0
-                formatMenu
+                sedExitcode=$?
+
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "SYSTEM_SPEC_CONF set to: ${SYSTEM_SPEC_CONF}" 0 0
+                        formatMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 formatMenu
         fi
@@ -134,8 +158,14 @@ set_TECHNICIAN_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|TECHNICIAN_CONF=".*"|TECHNICIAN_CONF=\"$TECHNICIAN_CONF\"|" "${config}"
-                whiptail --msgbox "TECHNICIAN_CONF set to: ${TECHNICIAN_CONF}" 0 0
-                serviceMenu
+                sedExitcode=$?
+
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "TECHNICIAN_CONF set to: ${TECHNICIAN_CONF}" 0 0
+                        serviceMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 serviceMenu
         fi
@@ -149,8 +179,14 @@ set_PROVIDER_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|PROVIDER_CONF=".*"|PROVIDER_CONF=\"$PROVIDER_CONF\"|" "${config}"
-                whiptail --msgbox "PROVIDER_CONF set to: ${PROVIDER_CONF}" 0 0
-                serviceMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "PROVIDER_CONF set to: ${PROVIDER_CONF}" 0 0
+                        serviceMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 serviceMenu
         fi
@@ -164,8 +200,14 @@ set_LOCATION_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|LOCATION_CONF=".*"|LOCATION_CONF=\"$LOCATION_CONF\"|" "${config}"
-                whiptail --msgbox "LOCATION_CONF set to: ${LOCATION_CONF}" 0 0
-                serviceMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "LOCATION_CONF set to: ${LOCATION_CONF}" 0 0
+                        serviceMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 serviceMenu
         fi
@@ -179,8 +221,14 @@ set_CUSTOMER_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|CUSTOMER_CONF=".*"|CUSTOMER_CONF=\"$CUSTOMER_CONF\"|" "${config}"
-                whiptail --msgbox "CUSTOMER_CONF set to: ${CUSTOMER_CONF}" 0 0
-                serviceMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "CUSTOMER_CONF set to: ${CUSTOMER_CONF}" 0 0
+                        serviceMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 serviceMenu
         fi
@@ -194,8 +242,14 @@ set_JOBNR_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|JOBNR_CONF=".*"|JOBNR_CONF=\"$JOBNR_CONF\"|" "${config}"
-                whiptail --msgbox "JOBNR_CONF set to: ${JOBNR_CONF}" 0 0
-                serviceMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "JOBNR_CONF set to: ${JOBNR_CONF}" 0 0
+                        serviceMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 serviceMenu
         fi
@@ -257,8 +311,14 @@ set_ERASURE_SPEC_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|ERASURE_SPEC_CONF=".*"|ERASURE_SPEC_CONF=\"$ERASURE_SPEC_CONF\"|" "${config}"
-                whiptail --msgbox "ERASURE_SPEC_CONF set to: ${ERASURE_SPEC_CONF}" 0 0
-                erasureSpecificationMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "ERASURE_SPEC_CONF set to: ${ERASURE_SPEC_CONF}" 0 0
+                        erasureSpecificationMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 erasureSpecificationMenu
         fi
@@ -284,8 +344,14 @@ set_VERIFICATION_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|VERIFICATION_CONF=".*"|VERIFICATION_CONF=\"$VERIFICATION_CONF\"|" "${config}"
-                whiptail --msgbox "VERIFICATION_CONF set to: ${VERIFICATION_CONF}" 0 0
-                erasureSpecificationMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "VERIFICATION_CONF set to: ${VERIFICATION_CONF}" 0 0
+                        erasureSpecificationMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 erasureSpecificationMenu
         fi
@@ -334,8 +400,14 @@ set_MANUAL_USER_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|MANUAL_USER_CONF=".*"|MANUAL_USER_CONF=\"$MANUAL_USER_CONF\"|" "${config}"
-                whiptail --msgbox "MANUAL_USER_CONF set to: ${MANUAL_USER_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "MANUAL_USER_CONF set to: ${MANUAL_USER_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
@@ -359,8 +431,14 @@ set_CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF=".*"|CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF=\"$CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF\"|" "${config}"
-                whiptail --msgbox "CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF set to: ${CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF set to: ${CHECK_ZERO_PATTERN_AND_OVERWRITE_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
@@ -384,8 +462,14 @@ set_ASSET_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|ASSET_CONF=".*"|ASSET_CONF=\"$ASSET_CONF\"|" "${config}"
-                whiptail --msgbox "ASSET_CONF set to: ${ASSET_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "ASSET_CONF set to: ${ASSET_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
@@ -409,8 +493,14 @@ set_FILTER_BOOT_DISK_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|FILTER_BOOT_DISK_CONF=".*"|FILTER_BOOT_DISK_CONF=\"$FILTER_BOOT_DISK_CONF\"|" "${config}"
-                whiptail --msgbox "FILTER_BOOT_DISK_CONF set to: ${FILTER_BOOT_DISK_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "FILTER_BOOT_DISK_CONF set to: ${FILTER_BOOT_DISK_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
@@ -435,8 +525,14 @@ set_SMART_TEST_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|SMART_TEST_CONF=".*"|SMART_TEST_CONF=\"$SMART_TEST_CONF\"|" "${config}"
-                whiptail --msgbox "SMART_TEST_CONF set to: ${SMART_TEST_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "SMART_TEST_CONF set to: ${SMART_TEST_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
@@ -460,8 +556,14 @@ set_SUSPEND_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|SUSPEND_CONF=".*"|SUSPEND_CONF=\"$SUSPEND_CONF\"|" "${config}"
-                whiptail --msgbox "SUSPEND_CONF set to: ${SUSPEND_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "SUSPEND_CONF set to: ${SUSPEND_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
@@ -485,8 +587,14 @@ set_AUTO_ERASURE_CONF() {
 
         if [[ "$exitcode" -eq 0 ]]; then
                 sed -i "s|AUTO_ERASURE_CONF=".*"|AUTO_ERASURE_CONF=\"$AUTO_ERASURE_CONF\"|" "${config}"
-                whiptail --msgbox "AUTO_ERASURE_CONF set to: ${AUTO_ERASURE_CONF}" 0 0
-                otherMenu
+                sedExitcode=$?
+                
+                if [[ "$sedExitcode" -eq 0 ]]; then
+                        whiptail --msgbox "AUTO_ERASURE_CONF set to: ${AUTO_ERASURE_CONF}" 0 0
+                        otherMenu
+                else
+                        whiptail --msgbox "Error occurred." 0 0
+                fi
         else
                 otherMenu
         fi
