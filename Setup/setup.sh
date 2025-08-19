@@ -12,7 +12,7 @@ config="${script_dir}/itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/confi
 
 set_ERASURE_NAME_CONF() {
 
-        ERASURE_NAME_CONF=$(whiptail --cancel-button "Back" --inputbox "Set Erasure name." 0 0 3>&1 1>&2 2>&3)
+        ERASURE_NAME_CONF=$(whiptail --cancel-button "Back" --inputbox "Set erasure name." 0 0 3>&1 1>&2 2>&3)
         exitcode=$?
 
         if [[ "$exitcode" -eq 0 ]]; then
@@ -65,8 +65,8 @@ set_ERASURE_LOGO_CONF() {
         done
 
         # Display whiptail with all detected logos.
-        choice=$(whiptail --cancel-button "Back" --title "Choose logo" --radiolist \
-            "Choose logo to be shown on report:" 0 0 0 \
+        choice=$(whiptail --cancel-button "Back" --title "Logo shown on report" --radiolist \
+            ""add logos: itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/lib/files/stylesheet/logo/"" 0 0 0 \
             "${options[@]}" 3>&1 1>&2 2>&3)
         exit_status=$?
 
@@ -94,7 +94,7 @@ set_SYSTEM_SPEC_CONF() {
         while true; do
                 SYSTEM_SPEC_CONF=$(whiptail --cancel-button "Back" --radiolist "Set specification list style." 0 0 0 \
                         "full" "Detailed specification list" OFF \
-                        "min" "Short main specification list" OFF 3>&1 1>&2 2>&3)
+                        "min" "Short specification list" OFF 3>&1 1>&2 2>&3)
                 exitcode=$?
 
                 if [[ "$exitcode" -eq 0 ]] && [[ "$SYSTEM_SPEC_CONF" == "" ]]; then
@@ -125,8 +125,8 @@ formatMenu() {
 	choice=$(whiptail --cancel-button "Back" --menu "Format Menu" 0 0 0 \
                 "Erasure_name" "'name' Erasure Report" \
                 "Version_name" "Version of itadOS" \
-                "Logo" "Logo location" \
-                "System_specs" "Detail of specifications"  3>&1 1>&2 2>&3)
+                "Logo" "Logo shown on PDF report" \
+                "System_specs" "Detail of specifications on PDF report"  3>&1 1>&2 2>&3)
 	exitcode=$?
 
 	if [[ "$exitcode" -ne 0 ]]; then
@@ -153,7 +153,7 @@ formatMenu() {
 
 set_TECHNICIAN_CONF() {
 
-        TECHNICIAN_CONF=$(whiptail --cancel-button "Back" --inputbox "Set Technician's name." 0 0 3>&1 1>&2 2>&3)
+        TECHNICIAN_CONF=$(whiptail --cancel-button "Back" --inputbox "Set technician's name." 0 0 3>&1 1>&2 2>&3)
         exitcode=$?
 
         if [[ "$exitcode" -eq 0 ]]; then
@@ -195,7 +195,7 @@ set_PROVIDER_CONF() {
 
 set_LOCATION_CONF() {
 
-        LOCATION_CONF=$(whiptail --cancel-button "Back" --inputbox "Set location." 0 0 3>&1 1>&2 2>&3)
+        LOCATION_CONF=$(whiptail --cancel-button "Back" --inputbox "Set location of erasure." 0 0 3>&1 1>&2 2>&3)
         exitcode=$?
 
         if [[ "$exitcode" -eq 0 ]]; then
@@ -386,9 +386,9 @@ erasureSpecificationMenu() {
 set_MANUAL_USER_CONF() {
 
         while true; do
-                MANUAL_USER_CONF=$(whiptail --cancel-button "Back" --radiolist "Set operational setting option." 0 0 0 \
+                MANUAL_USER_CONF=$(whiptail --cancel-button "Back" --radiolist "Set setting option." 0 0 0 \
                         "on" "Show settings on boot" OFF \
-                        "off" "Don't allow to change settings in operation" OFF 3>&1 1>&2 2>&3)
+                        "off" "Doesn't show settings on boot" OFF 3>&1 1>&2 2>&3)
                 exitcode=$?
 
                 if [[ "$exitcode" -eq 0 ]] && [[ "$MANUAL_USER_CONF" == "" ]]; then
@@ -480,8 +480,8 @@ set_FILTER_BOOT_DISK_CONF() {
 
         while true; do
                 FILTER_BOOT_DISK_CONF=$(whiptail --cancel-button "Back" --radiolist "Set boot filter option. (MAY BE UNRELIABLE)" 0 0 0 \
-                        "on" "Shows boot disk as erasable in disk options" OFF \
-                        "off" "Doesn't show boot disk as erasable" OFF 3>&1 1>&2 2>&3)
+                        "on" "Boot disk NOT erasable" OFF \
+                        "off" "Boot disk is erasable." OFF 3>&1 1>&2 2>&3)
                 exitcode=$?
 
                 if [[ "$exitcode" -eq 0 ]] && [[ "$FILTER_BOOT_DISK_CONF" == "" ]]; then
@@ -512,7 +512,7 @@ set_SMART_TEST_CONF() {
         while true; do
                 SMART_TEST_CONF=$(whiptail --cancel-button "Back" --radiolist "Set SMART health option." 0 0 0 \
                         "short" "Quick check, takes up to 2 minutes." OFF \
-                        "long" "Comprehensive test, can take hours." OFF \
+                        "long" "Comprehensive check, can take hours." OFF \
                         "skip" "Skip health check" OFF 3>&1 1>&2 2>&3)
                 exitcode=$?
 
@@ -605,10 +605,10 @@ otherMenu() {
 
         choice=$(whiptail --cancel-button "Back" --menu "Other Menu" 0 0 0 \
                 "Settings" "Show settings during boot" \
-                "Check_pattern" "If not expected pattern, over writes" \
+                "Check_pattern" "If unexpected pattern, over write" \
                 "Asset" "Asset tag gathering type" \
                 "Filter_boot" "Filter boot disk from erasure" \
-                "Disk_test" "Type of test performed on disks" \
+                "Disk_test" "Type of SMART test performed on disks" \
                 "Suspend" "Suspend prior to erasure attemps" \
                 "Auto_erasure" "Start erasure automatically" 3>&1 1>&2 2>&3)
         exitcode=$?
@@ -702,6 +702,9 @@ build() {
         lb build
         buildPID=$!
         wait "$buildPID"
+        exitcode=$?
+
+        return $exitcode
 
 }
 
@@ -709,8 +712,8 @@ setupMenu() {
 
         choice=$(whiptail --cancel-button "Exit" --menu "Setup" 0 0 0 \
                 "Dependencies" "Check if dependencies are installed" \
-                "Generate_ISO" "Generates itadOS ISO" \
-                "Modify_settings" "Modify itadOS default settings" 3>&1 1>&2 2>&3)
+                "Generate_ISO" "Generate itadOS ISO" \
+                "Modify_settings" "Modify default settings" 3>&1 1>&2 2>&3)
         exitcode=$?
 
         if [[ "$exitcode" -ne 0 ]]; then
