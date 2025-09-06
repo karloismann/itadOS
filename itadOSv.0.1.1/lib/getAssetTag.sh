@@ -50,7 +50,7 @@ ifReportExists() {
 #
 getAssetTag() {
 
-	ASSET_TAG=$(whiptail --title "REMOVE itadOS USB" --inputbox "Enter asset tag:" 10 40 3>&1 1>&2 2>&3 3>&-)
+	ASSET_TAG=$(whiptail --title "REMOVE itadOS USB" --inputbox "Enter asset tag:" 10 40 3>&1 1>&2 2>&3)
 	export ASSET_TAG
 
 }
