@@ -10,7 +10,7 @@ source lib/initialize.sh
 source lib/userConfig.sh
 source ./config.sh
 source lib/interaction.sh
-source lib/reportToUSB.sh
+source lib/saveReports.sh
 source lib/getAssetTag.sh
 source lib/log.sh
 source lib/getAttachedDisks.sh
@@ -81,7 +81,7 @@ while [[ "$RUNNING" == "true" ]]; do
 
     getDiskInfo
     reportGenerator
-    reportToUSB
+    saveReports
     finalMenu
 
     else

@@ -18,7 +18,7 @@ sata_hdd_purge_secure_erase() {
 	fi
 	
 	# Erasure
-	secureErase "$disk"
+	SATASecureErase "$disk"
 	secure_erase_exit_code=$?
 	
 	if [[ "$secure_erase_exit_code" == 0 ]]; then

@@ -235,7 +235,8 @@ checkAndRemoveDCO() {
 #
 # Checks if disk is frozen
 # @Param $1 disk to check
-# @Returns FROZEN status
+# @Returns 1 if frozen or unknown
+# @Returns 0 if NOT frozen
 #
 isDiskFrozen() {
     local disk="$1"
@@ -243,15 +244,15 @@ isDiskFrozen() {
     local frozen=$(hdparm -I /dev/"$disk" | awk '/frozen/{print $1}')
     case "$frozen" in
         frozen)
-			echo "yes"
+			echo "${disk} is frozen"
             return 1
             ;;
         not)
-			echo "no"
+			echo "${disk} is NOT frozen"
             return 0
             ;;
         *)
-			echo "UNKNOWN"
+			echo "${disk} frozen state UNKNOWN"
             return 1
             ;;
     esac
@@ -310,7 +311,7 @@ wakeFromFrozen() {
 # @Param $1 chosen disk
 # @Returns 0 if secure erase is supported and 1 if it is not
 #
-supportsSecureErase() {
+SATASupportsSecureErase() {
 	local disk="$1"
 
 	local supportsCommand=$(hdparm -I /dev/"$disk" | awk '/supported/ {print $1}' | awk 'NR==2 {print}')
@@ -330,7 +331,7 @@ supportsSecureErase() {
 # @Param $1 chosen disk
 # @Returns 0 if block erase is supported and 1 if it is not
 #
-supportsBlockErase() {
+SATASupportsBlockErase() {
 	local disk="$1"
 
 	local supportsCommand=$(hdparm -I /dev/"$disk" | awk '/BLOCK/ {print}')
@@ -355,7 +356,7 @@ supportsBlockErase() {
 # @Returns 1 if fail
 # @Returns 2 if disk locked
 #
-secureErase() {
+SATASecureErase() {
 	local disk="$1"
 	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 	local DISK_WARNING="lib/files/tmp/chosenDisks/${disk}/warning.txt"
@@ -402,10 +403,10 @@ secureErase() {
 }
 
 #
-# block erase SSD
+# block erase SATA SSD
 # @Param $1 disk to erase
 #
-blockErase() {
+SATABlockErase() {
 	local disk="$1"
 	local TMP_PROGRESS="lib/files/tmp/progress/"$disk"_progress.txt"
 
