@@ -50,7 +50,7 @@ erasure() {
 					
 					
 					# Block Erase
-					if supportsBlockErase "$disk"; then
+					if SATASupportsBlockErase "$disk"; then
 						
 						# Erasure
 						sata_ssd_purge_block_erase "$disk"
@@ -77,7 +77,7 @@ erasure() {
 					
 				"clear")
 					
-					if supportsSecureErase "$disk"; then
+					if SATASupportsSecureErase "$disk"; then
 						if ! sata_ssd_clear_secure_erase "$disk"; then
                             sata_ssd_clear_overwrite "$disk" "two"
                         fi
@@ -92,7 +92,7 @@ erasure() {
 				"auto")
 					
 					# Block Erase (Purge to Clear)
-					if supportsBlockErase "$disk"; then
+					if SATASupportsBlockErase "$disk"; then
 						
 						# Erasure
 						sata_ssd_purge_block_erase "$disk"
@@ -119,7 +119,7 @@ erasure() {
 					else
                         echo "${disk}: Purge not supported." >> "${DISK_FILES}${disk}/warnings.txt"
                         
-						if supportsSecureErase "$disk"; then
+						if SATASupportsSecureErase "$disk"; then
                             if ! sata_ssd_clear_secure_erase "$disk"; then
                                 sata_ssd_clear_overwrite "$disk" "two"
                             fi
@@ -149,7 +149,7 @@ erasure() {
 
                         # Add Crypto Erase
 
-                        if supportsSecureErase "$disk"; then
+                        if SATASupportsSecureErase "$disk"; then
                             sata_hdd_purge_secure_erase "$disk"
                         else
 
@@ -177,7 +177,7 @@ erasure() {
 
                     "auto")
 
-                        if supportsSecureErase "$disk"; then
+                        if SATASupportsSecureErase "$disk"; then
                             if ! sata_hdd_purge_secure_erase "$disk"; then
                                 sata_hdd_clear_overwrite "$disk" "two"
                             fi

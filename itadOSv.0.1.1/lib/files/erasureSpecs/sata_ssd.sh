@@ -23,7 +23,7 @@ sata_ssd_purge_block_erase() {
 	fi
 	
 	# Check if disk supports secure erase
-	supportsSecureErase "$disk"
+	SATASupportsSecureErase "$disk"
 	secureEraseSupport=$?
 
 	while true; do
@@ -33,7 +33,7 @@ sata_ssd_purge_block_erase() {
 		# If this does not finish successfully then end.
 		# If first attempt fails then try again once
 		for (( i=0; i<2; i++ )); do
-			blockErase "$disk"
+			SATABlockErase "$disk"
 			block_erase_exit_code=$?
 			
 			if 	[[ "$block_erase_exit_code" == 0 ]]; then
@@ -57,7 +57,7 @@ sata_ssd_purge_block_erase() {
 		#ERASURE 2
 		# If disk supports secure erase then use it
 		if [[ "$secureEraseSupport" == 0 ]]; then
-			secureErase "$disk"
+			SATASecureErase "$disk"
 			secure_erase_exit_code=$?
 		fi
 		
@@ -76,7 +76,7 @@ sata_ssd_purge_block_erase() {
 		
 		#ERASURE 3
 		# Second block erase
-		blockErase "$disk"
+		SATABlockErase "$disk"
 		block2_erase_exit_code=$?
 			
 		if [[ "$block2_erase_exit_code" == 0 ]]; then
@@ -128,7 +128,7 @@ sata_ssd_clear_secure_erase() {
 	fi
 	
 	# Erasure
-	secureErase "$disk"
+	SATASecureErase "$disk"
 	secure_erase_exit_code=$?
 	
 	if [[ "$secure_erase_exit_code" == 0 ]]; then

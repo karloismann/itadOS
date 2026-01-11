@@ -30,7 +30,7 @@ exportToUSB() {
                 retry_status=$?
 
                 if [[ "$retry_status" == 0 ]]; then
-                    reportToUSB
+                    saveReports
                 fi
 
                 break
@@ -82,7 +82,7 @@ saveReports() {
             if ! mount | grep -q "$partition"; then
 
                 mkdir -p /media/"$choice"
-                mount "$partition" /media/"$choice"
+                mount /dev/"$partition" /media/"$choice"
                 mount_status=$?
 
                 if [[ "$mount_status" == 0 ]]; then

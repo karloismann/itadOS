@@ -244,11 +244,11 @@ isDiskFrozen() {
     local frozen=$(hdparm -I /dev/"$disk" | awk '/frozen/{print $1}')
     case "$frozen" in
         frozen)
-			echo "${disk} is frozen"
+			echo "true"
             return 1
             ;;
         not)
-			echo "${disk} is NOT frozen"
+			echo "false"
             return 0
             ;;
         *)
@@ -295,11 +295,11 @@ wakeFromFrozen() {
 
     local disk="$1"
 
-    if [[ $(isDiskFrozen "$disk") != "no" ]]; then
+    if [[ $(isDiskFrozen "$disk") != "false" ]]; then
         for (( i=0; i<=2; i++ )); do
             suspend 10
 
-            if [[ $(isDiskFrozen "$disk") == "no" ]]; then
+            if [[ $(isDiskFrozen "$disk") == "false" ]]; then
                 break
             fi
         done
