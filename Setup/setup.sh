@@ -66,7 +66,7 @@ set_ERASURE_LOGO_CONF() {
 
         # Display whiptail with all detected logos.
         choice=$(whiptail --cancel-button "Back" --title "Logo shown on report" --radiolist \
-            ""add logos: itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/lib/files/stylesheet/logo/"" 0 0 0 \
+            "add logos: itadOSLiveBuild/config/includes.chroot/itadOSv.0.1.1/lib/files/stylesheet/logo/" 0 0 0 \
             "${options[@]}" 3>&1 1>&2 2>&3)
         exit_status=$?
 
