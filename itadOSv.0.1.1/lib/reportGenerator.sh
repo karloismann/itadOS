@@ -185,11 +185,11 @@ reportGenerator() {
 
     lshw -short | awk -v report="$REPORT" '/^\// {
         printf "    <entry>\n" >> report
-        printf "      <hwPath>%s</hwPath>\n", $1 >> report
-        printf "      <device>%s</device>\n", $2 >> report
-        printf "      <class>%s</class>\n", $3 >> report
+        printf "      <hwPath><![CDATA[%s]]></hwPath>\n", $1 >> report
+        printf "      <device><![CDATA[%s]]></device>\n", $2 >> report
+        printf "      <class><![CDATA[%s]]></class>\n", $3 >> report
         $1=$2=$3=""; desc=substr($0, index($0,$4));
-        printf "      <description>%s</description>\n", desc >> report
+        printf "      <description><![CDATA[%s]]></description>\n", desc >> report
         printf "    </entry>\n" >> report
     }'
     echo "  </specifications>" >> "$REPORT"
