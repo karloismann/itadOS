@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # List of dependencies
-packages=("whiptail" "nvme-cli" "lshw" "coreutils" "util-linux" "mmc-utils" "smartmontools" "pciutils" "fop" "xsltproc" "live-build" "isolinux")
+packages=("hdparm" "whiptail" "nvme-cli" "lshw" "coreutils" "util-linux" "mmc-utils" "smartmontools" "pciutils" "fop" "xsltproc" "live-build" "isolinux")
 installed="true"
 
 # Checks if package is installed 
